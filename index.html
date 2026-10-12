@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meteo-Arg-Pro v0.9 | Argentina · Provincias · Localidades</title>
+  <title>Meteo-Arg-Pro v1.0 | Argentina · Provincias · Localidades</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -11,7 +11,6 @@
   <style>
     :root {
       --acento: #10b981;
-      --acento-bg: rgba(16, 185, 129, 0.15);
     }
     body.tema-dia {
       background-color: #f1f5f9 !important;
@@ -25,15 +24,11 @@
     }
     body.tema-dia .sub-card {
       background-color: #f8fafc !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
       color: #0f172a !important;
     }
-    body.tema-dia .texto-fuerte {
-      color: #0f172a !important;
-    }
-    body.tema-dia .texto-suave {
-      color: #475569 !important;
-    }
+    body.tema-dia .texto-fuerte { color: #0f172a !important; }
+    body.tema-dia .texto-suave { color: #475569 !important; }
     .etiqueta-mapa {
       background: rgba(15, 23, 42, 0.92);
       border: 1.5px solid var(--acento);
@@ -57,24 +52,23 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans min-h-screen transition-colors duration-200">
 
-  <!-- BARRA SUPERIOR CON 3 DESPLEGABLES EN CASCADA (PAÍS -> PROVINCIA/REGIÓN -> SUB-LOCALIDAD) + PALETAS + DÍA/NOCHE -->
+  <!-- CABECERA PRINCIPAL -->
   <header class="panel-card bg-slate-900 border-b border-slate-800 px-4 py-3 sticky top-0 z-50 shadow-xl">
     <div class="max-w-7xl mx-auto space-y-3">
 
-      <!-- Fila 1: Marca + Menú de 3 Secciones + Tema Día/Noche y Paleta -->
       <div class="flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center gap-2.5">
           <span class="text-2xl">🛰️</span>
           <div>
             <div class="flex items-center gap-2">
               <h1 class="texto-fuerte text-lg font-extrabold tracking-tight text-white">METEO-ARG-PRO</h1>
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v0.9.0</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.0.0</span>
             </div>
             <p class="texto-suave text-[11px] text-slate-400">1. Oficial SMN · 2. Open-Meteo (ECMWF/GFS/ICON) · 3. Modelo Javier</p>
           </div>
         </div>
 
-        <!-- NAVEGACIÓN PRINCIPAL EN 3 SECCIONES -->
+        <!-- NAVEGACIÓN EN 3 SECCIONES -->
         <nav class="sub-card flex bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
           <button type="button" onclick="cambiarSeccion('seccion-rt')" id="nav-seccion-rt" class="px-3.5 py-1.5 rounded-lg text-xs font-bold btn-acento transition">
             ⚡ 1. Tiempo Real & Mapa
@@ -87,7 +81,7 @@
           </button>
         </nav>
 
-        <!-- SELECTOR DE PALETA DE COLORES + DÍA / NOCHE -->
+        <!-- PALETAS Y DÍA/NOCHE -->
         <div class="flex items-center gap-2">
           <select id="selector-paleta" onchange="cambiarPaletaColores(this.value)" class="sub-card bg-slate-800 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-white font-semibold">
             <option value="#10b981">🌿 Paleta Esmeralda</option>
@@ -95,17 +89,15 @@
             <option value="#8b5cf6">🟣 Paleta Cyber</option>
             <option value="#f59e0b">🔶 Paleta Ámbar</option>
           </select>
-
           <button type="button" onclick="alternarDiaNoche()" id="btn-dia-noche" class="sub-card bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
             🌙 Modo Noche
           </button>
         </div>
       </div>
 
-      <!-- Fila 2: FILTROS JERÁRQUICOS EN CASCADA (1. PAÍS -> 2. PROVINCIA/REGIÓN -> 3. SUB-LOCALIDAD) -->
+      <!-- FILTROS EN CASCADA: PAÍS -> PROVINCIA -> SUB-LOCALIDAD -->
       <div class="sub-card bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 flex flex-wrap justify-between items-center gap-3">
         <div class="flex flex-wrap items-center gap-3">
-          <!-- Desplegable 1: País -->
           <div class="flex items-center gap-1.5">
             <label class="texto-suave text-xs font-semibold text-slate-400">País:</label>
             <select id="sel-pais" class="sub-card bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-white font-semibold">
@@ -113,21 +105,18 @@
             </select>
           </div>
 
-          <!-- Desplegable 2: Provincia / Región -->
           <div class="flex items-center gap-1.5">
             <label class="texto-suave text-xs font-semibold text-slate-400">Provincia / Región:</label>
-            <select id="sel-provincia" onchange="alCambiarProvincia()" class="sub-card bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-white font-semibold">
+            <select id="sel-provincia" onchange="sincronizarSelectoresZona('TODAS')" class="sub-card bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-white font-semibold">
               <option value="AMBA" selected>📍 AMBA (CABA + Gran Buenos Aires)</option>
               <option value="CBA" disabled>🔒 Córdoba (Próximamente)</option>
               <option value="SFE" disabled>🔒 Santa Fe / Rosario (Próximamente)</option>
               <option value="MDZ" disabled>🔒 Mendoza (Próximamente)</option>
-              <option value="PAT" disabled>🔒 Patagonia (Próximamente)</option>
             </select>
           </div>
 
-          <!-- Desplegable 3: Sub-Localidad de la Región seleccionada -->
           <div class="flex items-center gap-1.5">
-            <label class="texto-suave text-xs font-semibold text-slate-400">Sub-Localidad (Filtro puntual):</label>
+            <label class="texto-suave text-xs font-semibold text-slate-400">Sub-Localidad:</label>
             <select id="selector-global-zona" onchange="sincronizarSelectoresZona(this.value)" class="sub-card bg-slate-900 border border-emerald-500/60 text-xs rounded-lg px-2.5 py-1.5 text-white font-bold">
               <option value="TODAS" selected>🌎 Todo el AMBA (Promedio General)</option>
               <option value="2">📍 Ituzaingó / Morón (Zona Oeste)</option>
@@ -160,7 +149,7 @@
     <!-- ========================================================================= -->
     <div id="seccion-rt" class="space-y-6">
 
-      <!-- BANNER DE ALERTAS SMN -->
+      <!-- BANNER DE ALERTAS SMN + SATÉLITE EN LENGUAJE CLARO (SIN GRADOS CONFUSOS DE ALTURA) -->
       <section class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap justify-between items-center gap-4">
         <div class="flex items-center gap-3">
           <div id="semaforo-smn" class="w-3.5 h-10 rounded bg-emerald-500"></div>
@@ -173,8 +162,8 @@
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-2.5 text-xs">
-          <div class="sub-card bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg">
-            🛰️ <strong>Tope Nuboso GOES:</strong> <span id="estado-acp-goes" class="text-emerald-400 font-semibold">Estable</span>
+          <div class="sub-card bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg" title="Observación satelital infrarroja GOES-East sobre la región">
+            🛰️ <strong>Satélite GOES (Nubosidad):</strong> <span id="estado-acp-goes" class="text-emerald-400 font-semibold">🟢 Nubes bajas / Sin tormenta</span>
           </div>
           <a href="https://www.smn.gob.ar/alertas" target="_blank" class="bg-sky-900/70 hover:bg-sky-800 text-sky-100 border border-sky-700 px-3 py-1.5 rounded-lg font-semibold transition">
             🔗 Alertas SMN ↗
@@ -182,26 +171,26 @@
         </div>
       </section>
 
-      <!-- CUADRO DE TIEMPO REAL CON DESVÍO DE TEMPERATURA (°C) Y DESVÍO DE AGUA (MM) -->
+      <!-- CUADRO DE TIEMPO REAL + MARCADOR RESUMIDO VISUAL -->
       <section class="panel-card bg-slate-900/90 border borde-acento rounded-xl p-5 shadow-lg">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
           <div class="flex items-center gap-2">
             <span class="inline-block w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
             <h2 id="titulo-tiempo-real" class="texto-fuerte text-base sm:text-lg font-bold text-white">TIEMPO REAL EN AMBA: Temperatura (°C) y Agua Caída (mm)</h2>
           </div>
-          <span class="texto-suave text-xs text-slate-400">Auto-recolección activa cada 15 min + Robot GitHub</span>
+          <span class="texto-suave text-xs text-slate-400">Robot GitHub: guarda cada 1 hora</span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Árbitro Físico -->
           <div class="sub-card bg-emerald-950/40 border border-emerald-600/50 rounded-lg p-4 flex flex-col justify-between">
             <div>
-              <div class="text-xs uppercase font-bold text-emerald-400 mb-1">🎯 ÁRBITRO: ESTACIONES REALES</div>
+              <div class="text-xs uppercase font-bold text-emerald-400 mb-1">🎯 ÁRBITRO: ESTACIÓN REAL</div>
               <p id="subtitulo-arbitro" class="texto-suave text-[11px] text-slate-300">Promedio estaciones oficiales del AMBA</p>
               <div class="grid grid-cols-3 gap-2 items-baseline mt-3 pt-2 border-t border-emerald-800/40">
                 <div>
                   <span class="texto-suave text-[11px] text-slate-400 block">🌡️ Temp.</span>
-                  <span id="real-temp" class="texto-fuerte text-xl font-extrabold text-white">14.6 °C</span>
+                  <span id="real-temp" class="texto-fuerte text-xl font-extrabold text-white">13.5 °C</span>
                 </div>
                 <div>
                   <span class="texto-suave text-[11px] text-slate-400 block">🌧️ Agua</span>
@@ -214,11 +203,11 @@
               </div>
             </div>
             <div id="ts-arbitro" class="mt-3 pt-2 border-t border-emerald-800/50 text-[11px] text-emerald-400 font-mono">
-              🕒 Medición Estación: Cargando...
+              🕒 Medición Estación: Activo
             </div>
           </div>
 
-          <!-- Cuadro 1: Oficial SMN -->
+          <!-- 1. Oficial SMN -->
           <div class="sub-card bg-slate-800/70 border border-slate-700 rounded-lg p-4 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center mb-1">
@@ -226,11 +215,11 @@
                 <span id="badge-rt-smn" class="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200">Activo</span>
               </div>
               <div class="flex justify-between mt-3 text-sm">
-                <div>🌡️ Temp: <strong id="rt-smn-temp" class="texto-fuerte text-white">15.5 °C</strong></div>
+                <div>🌡️ Temp: <strong id="rt-smn-temp" class="texto-fuerte text-white">14.2 °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-smn-rain" class="text-sky-400">0.0 mm</strong></div>
               </div>
               <div class="mt-2.5 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
-                <div id="err-smn-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.9 °C</div>
+                <div id="err-smn-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.7 °C</div>
                 <div id="err-smn-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: ±0.0 mm</div>
               </div>
             </div>
@@ -239,7 +228,7 @@
             </div>
           </div>
 
-          <!-- Cuadro 2: Open-Meteo (ECMWF/GFS/ICON) -->
+          <!-- 2. Open-Meteo -->
           <div class="sub-card bg-slate-800/70 border border-slate-700 rounded-lg p-4 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center mb-1">
@@ -247,11 +236,11 @@
                 <span id="badge-rt-om" class="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200">Activo</span>
               </div>
               <div class="flex justify-between mt-3 text-sm">
-                <div>🌡️ Temp: <strong id="rt-om-temp" class="texto-fuerte text-white">14.8 °C</strong></div>
+                <div>🌡️ Temp: <strong id="rt-om-temp" class="texto-fuerte text-white">13.8 °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-om-rain" class="text-sky-400">0.0 mm</strong></div>
               </div>
               <div class="mt-2.5 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
-                <div id="err-om-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.2 °C</div>
+                <div id="err-om-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.3 °C</div>
                 <div id="err-om-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: ±0.0 mm</div>
               </div>
             </div>
@@ -260,7 +249,7 @@
             </div>
           </div>
 
-          <!-- Cuadro 3: Modelo Javier -->
+          <!-- 3. Modelo Javier -->
           <div class="sub-card bg-indigo-950/50 border border-indigo-500/60 rounded-lg p-4 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center mb-1">
@@ -268,11 +257,11 @@
                 <span id="badge-rt-javier" class="text-[11px] px-2 py-0.5 rounded bg-emerald-600 text-white font-bold">🏆 MÁS PRECISO</span>
               </div>
               <div class="flex justify-between mt-3 text-sm">
-                <div>🌡️ Temp: <strong id="rt-our-temp" class="texto-fuerte text-white">14.7 °C</strong></div>
+                <div>🌡️ Temp: <strong id="rt-our-temp" class="texto-fuerte text-white">13.7 °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-our-rain" class="text-sky-400">0.0 mm</strong></div>
               </div>
               <div class="mt-2.5 pt-2 border-t border-indigo-800/50 space-y-1 text-xs">
-                <div id="err-our-temp" class="text-emerald-400 font-semibold">🌡️ Desvío Temp: ±0.1 °C</div>
+                <div id="err-our-temp" class="text-emerald-400 font-semibold">🌡️ Desvío Temp: ±0.2 °C</div>
                 <div id="err-our-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: ±0.0 mm</div>
               </div>
             </div>
@@ -282,39 +271,58 @@
           </div>
         </div>
 
-        <!-- LÍNEA DE VEREDICTO EN TIEMPO REAL -->
-        <div id="linea-veredicto-rt" class="sub-card mt-4 bg-slate-950 border border-emerald-500/50 rounded-lg px-4 py-3 text-xs md:text-sm space-y-1">
-          <div>🏆 <strong>Veredicto en Tiempo Real:</strong> Evaluando temperatura (°C) y milímetros de agua (mm)...</div>
+        <!-- RESUMEN VISUAL ULTRA-CLARO (2 CAJAS CORTAS SIN TEXTO LARGO) -->
+        <div id="linea-veredicto-rt" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <!-- Se completa dinámicamente con formato corto -->
         </div>
       </section>
 
-      <!-- MAPA METEOROLÓGICO -->
-      <section class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-4">
-        <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+      <!-- MAPA METEOROLÓGICO: MODO PRO ANIMADO (COMO EL MAPA DE METEORED/WINDY) + MODO ESTACIONES -->
+      <section class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+        <div class="flex flex-wrap justify-between items-center gap-3">
           <div>
             <h3 id="titulo-mapa-dinamico" class="texto-fuerte font-bold text-white">🗺️ Mapa Meteorológico — AMBA (CABA + Gran Buenos Aires)</h3>
-            <p id="subtitulo-mapa" class="text-xs text-emerald-400">Campo continuo de color (Calor / Lluvia / Viento) + valores en cada punto</p>
+            <p class="texto-suave text-xs text-slate-400">Elegí entre el Mapa de Calor Animado Global (ECMWF/GFS) o las Estaciones Locales del AMBA</p>
           </div>
 
-          <div class="flex flex-wrap gap-1.5">
-            <button type="button" onclick="cambiarCapaMapa('temp')" id="map-btn-temp" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-amber-600 text-white">🌡️ Temperatura (Calor)</button>
-            <button type="button" onclick="cambiarCapaMapa('rain')" id="map-btn-rain" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">🌧️ Agua + Radar Lluvia</button>
-            <button type="button" onclick="cambiarCapaMapa('wind')" id="map-btn-wind" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">💨 Viento y Dirección</button>
-            <button type="button" onclick="cambiarCapaMapa('hum')" id="map-btn-hum" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">💧 Humedad</button>
-            <button type="button" onclick="cambiarCapaMapa('sat')" id="map-btn-sat" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">🛰️ Satélite NASA</button>
-            <button type="button" onclick="cambiarCapaMapa('fire')" id="map-btn-fire" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">🔥 Riesgo Fuego</button>
+          <!-- CONMUTADOR ENTRE MAPA ANIMADO PROFESIONAL Y MAPA DE ESTACIONES -->
+          <div class="sub-card inline-flex bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
+            <button type="button" onclick="cambiarMotorMapa('windy')" id="btn-motor-windy" class="px-3 py-1.5 rounded-lg text-xs font-bold btn-acento transition">
+              🌍 Mapa Calor Animado (ECMWF/Windy)
+            </button>
+            <button type="button" onclick="cambiarMotorMapa('leaflet')" id="btn-motor-leaflet" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">
+              📍 Mapa de Estaciones AMBA (8 Puntos)
+            </button>
           </div>
         </div>
 
-        <div id="mapa-amba" class="w-full h-[450px] rounded-lg border border-slate-700 relative"></div>
+        <!-- BOTONES DE VARIABLES DEL MAPA (FUNCIONAN EN AMBOS MOTORES) -->
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="cambiarCapaMapa('temp')" id="map-btn-temp" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-amber-600 text-white">🌡️ Temperatura (Calor 2m)</button>
+          <button type="button" onclick="cambiarCapaMapa('rain')" id="map-btn-rain" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">🌧️ Lluvia y Acumulado</button>
+          <button type="button" onclick="cambiarCapaMapa('wind')" id="map-btn-wind" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">💨 Viento y Ráfagas</button>
+          <button type="button" onclick="cambiarCapaMapa('hum')" id="map-btn-hum" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">💧 Humedad</button>
+          <button type="button" onclick="cambiarCapaMapa('sat')" id="map-btn-sat" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">☁️ Nubes / Radar</button>
+          <button type="button" onclick="cambiarCapaMapa('fire')" id="map-btn-fire" class="text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">🔥 Riesgo Fuego (Estaciones)</button>
+        </div>
 
-        <div id="leyenda-mapa" class="sub-card mt-3 flex flex-wrap items-center justify-between gap-2 text-xs bg-slate-950 px-3 py-2.5 rounded border border-slate-800">
-          <div class="flex items-center gap-2">
-            <strong>Escala:</strong>
-            <span id="barra-gradiente-leyenda" class="inline-block w-44 h-3 rounded" style="background: linear-gradient(90deg, #0284c7, #10b981, #eab308, #ef4444);"></span>
-            <span id="texto-escala-leyenda">Frío (&lt;10°C) → Templado (15°C) → Cálido (&gt;24°C)</span>
+        <!-- CONTENEDOR 1: MAPA PROFESIONAL DE CALOR Y PARTÍCULAS ANIMADAS (COMO METEORED/WINDY) -->
+        <div id="contenedor-windy" class="w-full h-[480px] rounded-lg overflow-hidden border border-slate-700">
+          <iframe
+            id="iframe-windy"
+            class="w-full h-full border-0"
+            src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=9&overlay=temp&product=ecmwf&level=surface&lat=-34.63&lon=-58.53&detailLat=-34.63&detailLon=-58.53&marker=true&pressure=true"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <!-- CONTENEDOR 2: MAPA LEAFLET DE LAS 8 ESTACIONES PUNTUALES DEL AMBA -->
+        <div id="contenedor-leaflet" class="hidden space-y-2">
+          <div id="mapa-amba" class="w-full h-[450px] rounded-lg border border-slate-700 relative"></div>
+          <div class="sub-card flex flex-wrap items-center justify-between gap-2 text-xs bg-slate-950 px-3 py-2 rounded border border-slate-800">
+            <span>📍 <strong>Vista de Sensores Locales:</strong> Hacé clic en cualquier estación para ver su detalle individual</span>
+            <span class="texto-suave text-slate-400">Contraste térmico dinámico activado</span>
           </div>
-          <span class="texto-suave text-slate-400">Si elegís una Sub-Localidad arriba, el mapa hace foco en esa zona</span>
         </div>
       </section>
     </div>
@@ -338,7 +346,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- COLUMNA 1: 1. OFICIAL SMN -->
+          <!-- COLUMNA 1 -->
           <div class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -370,7 +378,7 @@
             <div id="c1-ts" class="texto-suave text-[11px] text-slate-400 font-mono mt-4 pt-2 border-t border-slate-800">🕒 Actualización SMN: Activo</div>
           </div>
 
-          <!-- COLUMNA 2: 2. OPEN-METEO -->
+          <!-- COLUMNA 2 -->
           <div class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -402,7 +410,7 @@
             <div id="c2-ts" class="texto-suave text-[11px] text-slate-400 font-mono mt-4 pt-2 border-t border-slate-800">🕒 Actualización Open-Meteo: Activo</div>
           </div>
 
-          <!-- COLUMNA 3: 3. MODELO JAVIER -->
+          <!-- COLUMNA 3 -->
           <div class="panel-card bg-slate-900 border borde-acento rounded-xl p-5 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -418,12 +426,12 @@
                   <strong id="c3-temp" class="text-emerald-400">-- °C</strong>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
-                  <span class="texto-suave text-slate-300">Agua Prevista + GOES IR:</span>
+                  <span class="texto-suave text-slate-300">Agua Prevista + Satélite:</span>
                   <strong id="c3-rain" class="text-sky-400">--% | -- mm</strong>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
-                  <span class="texto-suave text-slate-300">Tope Nuboso IR (GOES / INMET):</span>
-                  <strong id="c3-ir" class="text-indigo-400">-- °C</strong>
+                  <span class="texto-suave text-slate-300">Actividad Nubosa GOES:</span>
+                  <strong id="c3-ir" class="text-indigo-400">Sin tormenta severa</strong>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
                   <span class="texto-suave text-slate-300">Índice Angström (Riesgo Fuego):</span>
@@ -464,7 +472,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- SECCIÓN 3: DASHBOARD PROFESIONAL Y AUDITORÍA POR LOCALIDAD                -->
+    <!-- SECCIÓN 3: DASHBOARD CON FILTRO DE FECHAS + CONCLUSIÓN AUTOMÁTICA         -->
     <!-- ========================================================================= -->
     <div id="seccion-dashboard" class="space-y-6 hidden">
 
@@ -473,15 +481,16 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="text-2xl">📊</span>
-              <h2 class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión por Localidad (Temperatura °C + Agua mm)</h2>
+              <h2 class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión por Localidad y Fechas</h2>
             </div>
             <p class="texto-suave text-xs text-slate-400 mt-1">
-              Compara qué servicio estuvo más cerca del termómetro y del pluviómetro oficial en cada localidad.
+              Filtra por localidad y rango de fechas (habilitado desde el 12/10/2026 hasta el último día registrado).
             </p>
           </div>
 
+          <!-- CONTROLES DEL DASHBOARD: LOCALIDAD + FECHA DESDE / HASTA + EXPORTAR -->
           <div class="flex flex-wrap items-center gap-2">
-            <select id="filtro-localidad-dashboard" onchange="sincronizarSelectoresZona(this.value)" class="sub-card bg-slate-950 border borde-acento text-xs rounded-lg px-3 py-2 text-white font-semibold">
+            <select id="filtro-localidad-dashboard" onchange="sincronizarSelectoresZona(this.value)" class="sub-card bg-slate-950 border borde-acento text-xs rounded-lg px-2.5 py-2 text-white font-semibold">
               <option value="TODAS">🌎 Todo el AMBA (8 localidades)</option>
               <option value="2">📍 Ituzaingó / Morón (Zona Oeste)</option>
               <option value="0">📍 Aeroparque SABE (CABA Costa)</option>
@@ -492,6 +501,13 @@
               <option value="6">📍 San Miguel / Campo de Mayo (Zona NO)</option>
               <option value="7">📍 La Plata SADL (Extremo Sur)</option>
             </select>
+
+            <div class="sub-card flex items-center gap-1.5 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs">
+              <span class="texto-suave text-slate-400">Desde:</span>
+              <input type="date" id="fecha-desde-dash" min="2026-10-12" value="2026-10-12" onchange="renderizarDashboardHistorico()" class="bg-transparent text-white font-mono focus:outline-none" />
+              <span class="texto-suave text-slate-400 ml-1">Hasta:</span>
+              <input type="date" id="fecha-hasta-dash" min="2026-10-12" value="2026-10-12" onchange="renderizarDashboardHistorico()" class="bg-transparent text-white font-mono focus:outline-none" />
+            </div>
 
             <button type="button" onclick="exportarHistorialCSV()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
               📥 Exportar Excel (.CSV)
@@ -506,10 +522,15 @@
           </div>
         </div>
 
+        <!-- CUADRO DE CONCLUSIÓN AUTOMÁTICA POR LOCALIDAD Y FECHA -->
+        <div id="conclusion-dashboard-box" class="sub-card bg-emerald-950/30 border border-emerald-500/50 rounded-xl p-4 text-xs sm:text-sm space-y-1.5">
+          <!-- Se redacta sola según la localidad y fechas seleccionadas -->
+        </div>
+
         <!-- 4 TARJETAS KPI DEL DASHBOARD -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
           <div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">
-            <span class="texto-suave text-xs text-slate-400 block">Muestras Auditadas</span>
+            <span class="texto-suave text-xs text-slate-400 block">Muestras en Rango</span>
             <strong id="dash-total-reg" class="texto-fuerte text-2xl text-white">8 registros</strong>
             <span id="dash-ciudad-activa" class="text-xs text-emerald-400 font-semibold block mt-1">Todo el AMBA</span>
           </div>
@@ -552,7 +573,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">
             <h3 class="texto-fuerte text-sm font-bold text-white mb-1">📊 Gráfico 1: Error Medio en Temperatura (°C) y Agua (mm)</h3>
-            <p class="texto-suave text-xs text-slate-400 mb-3">Barra más baja = modelo más exacto en la localidad seleccionada</p>
+            <p class="texto-suave text-xs text-slate-400 mb-3">Barra más baja = modelo más exacto en la localidad y fechas elegidas</p>
             <div class="w-full h-60"><canvas id="graficoDashboardErrores"></canvas></div>
           </div>
 
@@ -576,7 +597,7 @@
                   <th class="py-2.5 px-3 text-sky-400">1. Oficial SMN (Desvío °C | mm)</th>
                   <th class="py-2.5 px-3 text-purple-400">2. Open-Meteo (Desvío °C | mm)</th>
                   <th class="py-2.5 px-3 text-indigo-400">3. Modelo Javier (Desvío °C | mm)</th>
-                  <th class="py-2.5 px-3">🏆 Ganador General</th>
+                  <th class="py-2.5 px-3">🏆 Ganador</th>
                 </tr>
               </thead>
               <tbody id="tabla-historial-body" class="divide-y divide-slate-800/60">
@@ -590,32 +611,32 @@
   </main>
 
   <script>
-    const CLAVE_STORAGE = "meteo_arg_pro_historial_v09";
+    const CLAVE_STORAGE = "meteo_arg_pro_historial_v10";
     let seccionActiva = "seccion-rt";
+    let motorMapaActivo = "windy";
     let modoDia = false;
 
     const puntosAMBA = [
-      { nombre: "Aeroparque SABE (CABA)", lat: -34.559, lon: -58.416, baseT: 14.8, baseH: 72, baseW: 18, baseG: 28, baseD: 130 },
-      { nombre: "Obs. Central CABA (SMN)", lat: -34.590, lon: -58.480, baseT: 14.6, baseH: 68, baseW: 14, baseG: 24, baseD: 135 },
-      { nombre: "Ituzaingó / Morón (Zona Oeste)", lat: -34.658, lon: -58.667, baseT: 14.2, baseH: 66, baseW: 13, baseG: 22, baseD: 140 },
-      { nombre: "Ezeiza SAEZ (Zona Sur-Oeste)", lat: -34.822, lon: -58.536, baseT: 13.9, baseH: 70, baseW: 16, baseG: 26, baseD: 145 },
-      { nombre: "San Fernando / Tigre (Zona Norte)", lat: -34.453, lon: -58.590, baseT: 14.5, baseH: 75, baseW: 15, baseG: 25, baseD: 125 },
-      { nombre: "Quilmes / Avellaneda (Zona Sur)", lat: -34.720, lon: -58.260, baseT: 14.4, baseH: 74, baseW: 19, baseG: 30, baseD: 120 },
-      { nombre: "San Miguel / Campo de Mayo (NO)", lat: -34.540, lon: -58.700, baseT: 14.1, baseH: 67, baseW: 12, baseG: 21, baseD: 140 },
-      { nombre: "La Plata SADL (Extremo Sur)", lat: -34.921, lon: -57.954, baseT: 13.6, baseH: 73, baseW: 17, baseG: 27, baseD: 130 }
+      { nombre: "Aeroparque SABE (CABA)", lat: -34.559, lon: -58.416, baseT: 13.8, baseH: 72, baseW: 18, baseG: 28, baseD: 130 },
+      { nombre: "Obs. Central CABA (SMN)", lat: -34.590, lon: -58.480, baseT: 13.7, baseH: 68, baseW: 14, baseG: 24, baseD: 135 },
+      { nombre: "Ituzaingó / Morón (Zona Oeste)", lat: -34.658, lon: -58.667, baseT: 13.5, baseH: 66, baseW: 13, baseG: 22, baseD: 140 },
+      { nombre: "Ezeiza SAEZ (Zona Sur-Oeste)", lat: -34.822, lon: -58.536, baseT: 13.1, baseH: 70, baseW: 16, baseG: 26, baseD: 145 },
+      { nombre: "San Fernando / Tigre (Zona Norte)", lat: -34.453, lon: -58.590, baseT: 13.6, baseH: 75, baseW: 15, baseG: 25, baseD: 125 },
+      { nombre: "Quilmes / Avellaneda (Zona Sur)", lat: -34.720, lon: -58.260, baseT: 13.4, baseH: 74, baseW: 19, baseG: 30, baseD: 120 },
+      { nombre: "San Miguel / Campo de Mayo (NO)", lat: -34.540, lon: -58.700, baseT: 13.3, baseH: 67, baseW: 12, baseG: 21, baseD: 140 },
+      { nombre: "La Plata SADL (Extremo Sur)", lat: -34.921, lon: -57.954, baseT: 12.8, baseH: 73, baseW: 17, baseG: 27, baseD: 130 }
     ];
 
     let datosPuntosAMBA = [];
     let datosECMWF = null, datosGFS = null, datosICON = null;
     let pesosBMA = { ecmwf: 0.55, icon: 0.25, gfs: 0.20 };
     let biasKalman0 = -0.1;
-    let tempRealArbitro = 14.4;
+    let tempRealArbitro = 13.5;
     let chartInstancia = null, chartLluviaInstancia = null;
     let chartDashErrores = null, chartDashEvolucion = null;
     let modoMapaActual = 'temp';
     let horizonteActual = 24;
 
-    // PALETA DE COLORES Y MODO DÍA / NOCHE
     function cambiarPaletaColores(colorHex) {
       document.documentElement.style.setProperty('--acento', colorHex);
     }
@@ -623,8 +644,7 @@
     function alternarDiaNoche() {
       modoDia = !modoDia;
       document.body.classList.toggle('tema-dia', modoDia);
-      const btn = document.getElementById("btn-dia-noche");
-      btn.innerText = modoDia ? "☀️ Modo Día" : "🌙 Modo Noche";
+      document.getElementById("btn-dia-noche").innerText = modoDia ? "☀️ Modo Día" : "🌙 Modo Noche";
       if (modoDia) {
         if (map.hasLayer(tileOscuro)) map.removeLayer(tileOscuro);
         tileClaro.addTo(map);
@@ -634,11 +654,23 @@
       }
     }
 
-    function alCambiarProvincia() {
-      sincronizarSelectoresZona("TODAS");
+    function cambiarMotorMapa(motor) {
+      motorMapaActivo = motor;
+      const esWindy = (motor === 'windy');
+      document.getElementById("contenedor-windy").classList.toggle("hidden", !esWindy);
+      document.getElementById("contenedor-leaflet").classList.toggle("hidden", esWindy);
+      document.getElementById("btn-motor-windy").className = esWindy
+        ? "px-3 py-1.5 rounded-lg text-xs font-bold btn-acento transition"
+        : "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+      document.getElementById("btn-motor-leaflet").className = !esWindy
+        ? "px-3 py-1.5 rounded-lg text-xs font-bold btn-acento transition"
+        : "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+
+      if (!esWindy) {
+        setTimeout(() => { map.invalidateSize(); capaPinturaContinua._redraw(); }, 80);
+      }
     }
 
-    // MAPA CON CAPAS DÍA / NOCHE Y PINTURA CONTINUA IDW
     const map = L.map('mapa-amba').setView([-34.63, -58.53], 10);
     const tileOscuro = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Esri Dark Canvas'
@@ -652,7 +684,7 @@
         this._map = map;
         this._canvas = L.DomUtil.create('canvas', 'leaflet-layer');
         this._canvas.style.pointerEvents = 'none';
-        this._canvas.style.opacity = '0.52';
+        this._canvas.style.opacity = '0.48';
         map.getPanes().overlayPane.appendChild(this._canvas);
         map.on('moveend zoomend resize', this._redraw, this);
         this._redraw();
@@ -673,9 +705,13 @@
         const ctx = this._canvas.getContext('2d');
         ctx.clearRect(0, 0, size.x, size.y);
 
+        const valores = datosPuntosAMBA.map(p => obtenerValorSegunModo(p, modoMapaActual));
+        const minV = Math.min(...valores);
+        const maxV = Math.max(...valores);
+
         const pts = datosPuntosAMBA.map(p => {
           const pt = this._map.latLngToContainerPoint([p.lat, p.lon]);
-          return { x: pt.x, y: pt.y, data: p };
+          return { x: pt.x, y: pt.y, val: obtenerValorSegunModo(p, modoMapaActual) };
         });
 
         const step = 10;
@@ -684,12 +720,15 @@
             let sumW = 0, val = 0;
             for (let i = 0; i < pts.length; i++) {
               const dx = x - pts[i].x, dy = y - pts[i].y;
-              const d2 = dx * dx + dy * dy + 400;
+              const d2 = dx * dx + dy * dy + 250;
               const w = 1 / (d2 * d2);
               sumW += w;
-              val += w * obtenerValorSegunModo(pts[i].data, modoMapaActual);
+              val += w * pts[i].val;
             }
-            ctx.fillStyle = obtenerColorRGBContinuo(val / sumW, modoMapaActual);
+            const vInterp = val / sumW;
+            const ratio = (maxV - minV) > 0.2 ? (vInterp - minV) / (maxV - minV) : 0.5;
+            const hue = Math.round((1 - Math.max(0, Math.min(1, ratio))) * 220);
+            ctx.fillStyle = "hsla(" + hue + ", 85%, 48%, 0.72)";
             ctx.fillRect(x, y, step, step);
           }
         }
@@ -704,26 +743,31 @@
     }).addTo(map);
 
     let capaElementosMapa = L.layerGroup().addTo(map);
-    const fechaAyer = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    const nasaLayer = L.tileLayer(
-      'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/' + fechaAyer + '/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
-      { opacity: 0.50 }
-    );
-    let radarLayer = null;
 
-    fetch("https://api.rainviewer.com/public/weather-maps.json")
-      .then(r => r.json())
-      .then(data => {
-        if (data.radar && data.radar.past && data.radar.past.length > 0) {
-          const ultimo = data.radar.past[data.radar.past.length - 1];
-          radarLayer = L.tileLayer(data.host + ultimo.path + '/256/{z}/{x}/{y}/2/1_1.png', { opacity: 0.75 });
-        }
-      }).catch(() => {});
+    function obtenerFechaISO(dateObj) {
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      return y + "-" + m + "-" + d;
+    }
 
-    // GENERADOR DE DATOS BASE GARANTIZADOS (PARA QUE NUNCA QUEDE EN "--" AUNQUE TARDE LA API)
+    function formatearFechaHora(dateObj) {
+      const d = String(dateObj.getDate()).padStart(2, '0');
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const h = String(dateObj.getHours()).padStart(2, '0');
+      const min = String(dateObj.getMinutes()).padStart(2, '0');
+      return d + "/" + m + " " + h + ":" + min + " hs";
+    }
+
     function inicializarDatosBaseInmediatos() {
       const ahora = new Date();
       const strHora = formatearFechaHora(ahora);
+      const fechaHoyISO = obtenerFechaISO(ahora) > "2026-10-12" ? obtenerFechaISO(ahora) : "2026-10-12";
+
+      document.getElementById("fecha-desde-dash").value = "2026-10-12";
+      document.getElementById("fecha-hasta-dash").value = fechaHoyISO;
+      document.getElementById("fecha-hasta-dash").max = fechaHoyISO;
+
       datosPuntosAMBA = puntosAMBA.map(p => ({
         ...p,
         horaDato: strHora,
@@ -742,22 +786,22 @@
         const d = new Date(ahora.getTime() + h * 3600000);
         const hh = String(d.getHours()).padStart(2, '0') + ":00";
         times.push("2026-10-12T" + hh);
-        const ondaDiaria = Math.sin(((d.getHours() - 6) / 24) * Math.PI * 2) * 3.8;
-        tE.push(+(14.5 + ondaDiaria).toFixed(1));
-        tG.push(+(15.1 + ondaDiaria * 1.05).toFixed(1));
-        tI.push(+(14.3 + ondaDiaria * 0.95).toFixed(1));
-        const ll = (h >= 18 && h <= 23) ? 0.4 : 0.0;
+        const ondaDiaria = Math.sin(((d.getHours() - 6) / 24) * Math.PI * 2) * 3.5;
+        tE.push(+(13.8 + ondaDiaria).toFixed(1));
+        tG.push(+(14.3 + ondaDiaria * 1.05).toFixed(1));
+        tI.push(+(13.6 + ondaDiaria * 0.95).toFixed(1));
+        const ll = (h >= 18 && h <= 22) ? 0.3 : 0.0;
         rE.push(ll);
-        rG.push(ll > 0 ? 0.6 : 0.0);
-        rI.push(ll > 0 ? 0.3 : 0.0);
-        prob.push(ll > 0 ? 45 : 10);
-        clouds.push(ll > 0 ? 80 : 35);
-        wind.push(15 + (h % 5));
-        gusts.push(24 + (h % 7));
+        rG.push(ll > 0 ? 0.5 : 0.0);
+        rI.push(ll > 0 ? 0.2 : 0.0);
+        prob.push(ll > 0 ? 40 : 10);
+        clouds.push(ll > 0 ? 75 : 30);
+        wind.push(14 + (h % 5));
+        gusts.push(23 + (h % 7));
       }
 
       datosECMWF = { hourly: { time: times, temperature_2m: tE, precipitation: rE, cloud_cover: clouds, wind_speed_10m: wind } };
-      datosGFS = { current: { temperature_2m: 15.2, precipitation: 0.0 }, hourly: { time: times, temperature_2m: tG, precipitation: rG, precipitation_probability: prob, cloud_cover_high: clouds, wind_speed_10m: wind, wind_gusts_10m: gusts } };
+      datosGFS = { current: { temperature_2m: 14.2, precipitation: 0.0 }, hourly: { time: times, temperature_2m: tG, precipitation: rG, precipitation_probability: prob, cloud_cover_high: clouds, wind_speed_10m: wind, wind_gusts_10m: gusts } };
       datosICON = { hourly: { time: times, temperature_2m: tI, precipitation: rI, cloud_cover: clouds } };
 
       actualizarVistaSegunZonaSeleccionada();
@@ -773,7 +817,7 @@
           : "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
       });
 
-      if (idSeccion === 'seccion-rt') {
+      if (idSeccion === 'seccion-rt' && motorMapaActivo === 'leaflet') {
         setTimeout(() => { map.invalidateSize(); capaPinturaContinua._redraw(); }, 80);
       } else if (idSeccion === 'seccion-pronostico') {
         setTimeout(() => { renderizarMeteogramaYTabla(new Date().getHours(), obtenerOffsetActual()); }, 80);
@@ -798,43 +842,9 @@
       return p.temp;
     }
 
-    function obtenerColorRGBContinuo(val, modo) {
-      if (modo === 'temp') {
-        const t = Math.max(6, Math.min(30, val));
-        const hue = Math.round((1 - (t - 6) / 24) * 210);
-        return "hsla(" + hue + ", 85%, 48%, 0.75)";
-      }
-      if (modo === 'rain') {
-        if (val <= 0.05) return "hsla(215, 50%, 25%, 0.35)";
-        const hue = Math.round(200 + (Math.min(15, val) / 15) * 80);
-        return "hsla(" + hue + ", 90%, 50%, 0.80)";
-      }
-      if (modo === 'wind') {
-        const hue = Math.round(175 - (Math.min(45, Math.max(0, val)) / 45) * 145);
-        return "hsla(" + hue + ", 85%, 45%, 0.72)";
-      }
-      if (modo === 'hum') {
-        const l = 70 - ((Math.min(100, Math.max(30, val)) - 30) / 70) * 35;
-        return "hsla(198, 90%, " + Math.round(l) + "%, 0.72)";
-      }
-      if (modo === 'fire') {
-        const hue = Math.round(((Math.max(1.5, Math.min(5.0, val)) - 1.5) / 3.5) * 125);
-        return "hsla(" + hue + ", 85%, 46%, 0.72)";
-      }
-      return "hsla(220, 60%, 40%, 0.5)";
-    }
-
     function flechaDireccionViento(grados) {
       const dirs = ["↓ N", "↙ NE", "← E", "↖ SE", "↑ S", "↗ SO", "→ O", "↘ NO"];
       return dirs[Math.round(((grados %= 360) < 0 ? grados + 360 : grados) / 45) % 8];
-    }
-
-    function formatearFechaHora(dateObj) {
-      const d = String(dateObj.getDate()).padStart(2, '0');
-      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const h = String(dateObj.getHours()).padStart(2, '0');
-      const min = String(dateObj.getMinutes()).padStart(2, '0');
-      return d + "/" + m + " " + h + ":" + min + " hs";
     }
 
     function calcularPesosBMADinamicos(tReal, tE, tI, tG) {
@@ -868,19 +878,36 @@
       document.getElementById("titulo-tiempo-real").innerText = "TIEMPO REAL: " + textoZona.toUpperCase() + " (Temp °C y Agua mm)";
       document.getElementById("titulo-pronostico-zona").innerText = "📅 Pronóstico Extendido — " + textoZona;
 
-      if (val === "TODAS") {
-        map.setView([-34.63, -58.53], 10);
-      } else {
+      let latFoco = -34.63, lonFoco = -58.53, zoomFoco = 9;
+      if (val !== "TODAS") {
         const p = puntosAMBA[Number(val)];
-        if (p) map.setView([p.lat, p.lon], 12);
+        if (p) { latFoco = p.lat; lonFoco = p.lon; zoomFoco = 11; }
       }
+      map.setView([latFoco, lonFoco], zoomFoco + 1);
+      actualizarIframeWindy(modoMapaActual, latFoco, lonFoco, zoomFoco);
 
       actualizarVistaSegunZonaSeleccionada();
     }
 
+    function actualizarIframeWindy(modo, lat = -34.63, lon = -58.53, zoom = 9) {
+      const mapaCapasWindy = {
+        temp: "temp",
+        rain: "rain",
+        wind: "wind",
+        hum: "rh",
+        sat: "clouds",
+        fire: "temp"
+      };
+      const overlay = mapaCapasWindy[modo] || "temp";
+      const iframe = document.getElementById("iframe-windy");
+      if (iframe) {
+        iframe.src = "https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=" + zoom + "&overlay=" + overlay + "&product=ecmwf&level=surface&lat=" + lat + "&lon=" + lon + "&detailLat=" + lat + "&detailLon=" + lon + "&marker=true&pressure=true";
+      }
+    }
+
     async function cargarDatosEnVivoAMBA(forzarMensaje = false) {
       if (forzarMensaje) {
-        document.getElementById("reloj-actualizacion").innerText = "🔄 Midiendo en vivo...";
+        document.getElementById("reloj-actualizacion").innerText = "🔄 Midiendo...";
       }
 
       const urlECMWF = "https://api.open-meteo.com/v1/ecmwf?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
@@ -891,7 +918,6 @@
       const lons = puntosAMBA.map(p => p.lon).join(",");
       const urlMultiAMBA = "https://api.open-meteo.com/v1/forecast?latitude=" + lats + "&longitude=" + lons + "&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover,surface_pressure&timezone=America%2FArgentina%2FBuenos_Aires";
 
-      // Usamos Promise.allSettled para que si una API demora, no bloquee ni rompa las demás
       const resultados = await Promise.allSettled([
         fetch(urlECMWF).then(r => r.ok ? r.json() : null),
         fetch(urlGFS).then(r => r.ok ? r.json() : null),
@@ -925,13 +951,12 @@
         });
       }
 
-      // Intentar también leer data/historial_amba.json si fue actualizado por el robot de GitHub
       fetch("data/historial_amba.json")
         .then(r => r.ok ? r.json() : null)
         .then(histRemoto => {
           if (Array.isArray(histRemoto) && histRemoto.length > 0) {
             const local = obtenerHistorialGuardado();
-            const unidos = [...histRemoto, ...local].slice(0, 600);
+            const unidos = [...histRemoto, ...local].slice(0, 1200);
             localStorage.setItem(CLAVE_STORAGE, JSON.stringify(unidos));
           }
         }).catch(() => {});
@@ -947,6 +972,7 @@
       horaCerrada.setMinutes(0, 0, 0);
       const strHoraReporte = formatearFechaHora(horaCerrada);
       const strHoraActual = formatearFechaHora(ahora);
+      const fechaISO = obtenerFechaISO(ahora) > "2026-10-12" ? obtenerFechaISO(ahora) : "2026-10-12";
       const horaActualIdx = ahora.getHours();
 
       const selVal = document.getElementById("selector-global-zona").value;
@@ -972,9 +998,9 @@
       tempRealArbitro = tRealZona;
       const offsetMicroclima = tRealZona - promedioAMBA;
 
-      const tEcmwf = +(Number(datosECMWF.hourly.temperature_2m[horaActualIdx] ?? 14.8) + offsetMicroclima * 0.85).toFixed(1);
-      const tGfs = +(Number(datosGFS.current?.temperature_2m ?? datosGFS.hourly.temperature_2m[horaActualIdx] ?? 15.3) + offsetMicroclima * 0.60).toFixed(1);
-      const tIcon = +(Number(datosICON.hourly.temperature_2m[horaActualIdx] ?? 14.6) + offsetMicroclima * 0.75).toFixed(1);
+      const tEcmwf = +(Number(datosECMWF.hourly.temperature_2m[horaActualIdx] ?? 13.8) + offsetMicroclima * 0.85).toFixed(1);
+      const tGfs = +(Number(datosGFS.current?.temperature_2m ?? datosGFS.hourly.temperature_2m[horaActualIdx] ?? 14.2) + offsetMicroclima * 0.60).toFixed(1);
+      const tIcon = +(Number(datosICON.hourly.temperature_2m[horaActualIdx] ?? 13.6) + offsetMicroclima * 0.75).toFixed(1);
 
       const rEcmwf = +(Number(datosECMWF.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(1);
       const rGfs = +(Number(datosGFS.current?.precipitation ?? datosGFS.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(1);
@@ -1033,22 +1059,29 @@
         const el = document.getElementById(c.badgeId);
         if (c.score === minScore) {
           el.className = "text-[11px] px-2 py-0.5 rounded bg-emerald-600 text-white font-bold";
-          el.innerText = "🏆 MÁS PRECISO AHORA";
+          el.innerText = "🏆 MÁS PRECISO";
         } else {
           el.className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
           el.innerText = "±" + c.errT.toFixed(1) + "°C | ±" + c.errR.toFixed(1) + "mm";
         }
       });
 
+      // VEREDICTO CORTO Y DIRECTO EN 2 TARJETAS VISUALES (SIN TEXTO LARGO)
       const liderT = porTemp[0], segT = porTemp[1];
-      const liderR = porRain[0], segR = porRain[1];
-      const txtEmpateAgua = (porRain[0].errR === porRain[2].errR)
-        ? "Triple coincidencia en Agua (±" + liderR.errR.toFixed(1) + " mm vs pluviómetro)"
-        : "<span class='text-sky-400 font-bold'>" + liderR.nombre + "</span> (desvío ±" + liderR.errR.toFixed(1) + " mm; supera por " + (segR.errR - liderR.errR).toFixed(1) + " mm a " + segR.nombre + ")";
+      const liderR = porRain[0];
+      const txtGanadorAgua = (porRain[0].errR === porRain[2].errR)
+        ? "Empate Exacto en los 3 modelos (±" + liderR.errR.toFixed(1) + " mm)"
+        : liderR.nombre + " (Error ±" + liderR.errR.toFixed(1) + " mm)";
 
       document.getElementById("linea-veredicto-rt").innerHTML =
-        '<div>🌡️ <strong>Mejor en Temperatura ahora (' + strHoraActual + '):</strong> <span class="text-emerald-400 font-bold">' + liderT.nombre + '</span> (estimó <strong>' + liderT.temp.toFixed(1) + ' °C</strong> vs. <strong>' + tempRealArbitro.toFixed(1) + ' °C</strong> reales; desvío de <strong>±' + liderT.errT.toFixed(1) + ' °C</strong>, superando por <strong>' + (segT.errT - liderT.errT).toFixed(1) + ' °C</strong> a ' + segT.nombre + ').</div>' +
-        '<div>🌧️ <strong>Mejor en Agua Caída (mm) ahora:</strong> ' + txtEmpateAgua + '.</div>';
+        '<div class="sub-card bg-slate-950 border border-emerald-500/40 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
+          '<span>🌡️ <strong>Líder Temperatura:</strong> <strong class="text-emerald-400">' + liderT.nombre + '</strong></span>' +
+          '<span class="font-mono text-slate-300">' + liderT.temp.toFixed(1) + '°C vs ' + tempRealArbitro.toFixed(1) + '°C Real (Error ±' + liderT.errT.toFixed(1) + '°C · gana por ' + (segT.errT - liderT.errT).toFixed(1) + '°C)</span>' +
+        '</div>' +
+        '<div class="sub-card bg-slate-950 border border-sky-500/40 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
+          '<span>🌧️ <strong>Líder Agua Caída:</strong> <strong class="text-sky-400">' + txtGanadorAgua + '</strong></span>' +
+          '<span class="font-mono text-slate-300">Pluviómetro Real: ' + rRealZona.toFixed(1) + ' mm</span>' +
+        '</div>';
 
       document.getElementById("ts-arbitro").innerText = "🕒 Medición Estación: " + strHoraReporte;
       document.getElementById("ts-smn").innerText = "🕒 Boletín SMN: " + strHoraReporte;
@@ -1058,9 +1091,9 @@
       document.getElementById("c1-ts").innerText = "🕒 Emitido por 1. Oficial SMN: " + strHoraReporte;
       document.getElementById("c2-ts").innerText = "🕒 Consulta 2. Open-Meteo: " + strHoraActual;
       document.getElementById("c3-ts").innerText = "🕒 Cálculo 3. Modelo Javier: " + strHoraActual;
-      document.getElementById("reloj-actualizacion").innerText = "✅ Actualizado: " + strHoraActual;
+      document.getElementById("reloj-actualizacion").innerText = "✅ " + strHoraActual;
 
-      guardarSnapshotPorCiudades(strHoraActual, tSmn, rSmn, tEcmwf, rEcmwf, tJavier, rJavier);
+      guardarSnapshotPorCiudades(strHoraActual, fechaISO, tSmn, rSmn, tEcmwf, rEcmwf, tJavier, rJavier);
       cambiarHorizonte(horizonteActual);
       cambiarCapaMapa(modoMapaActual);
 
@@ -1076,11 +1109,9 @@
       catch (e) { return []; }
     }
 
-    function guardarSnapshotPorCiudades(fechaHoraStr, tSmnBase, rSmnBase, tEcmwfBase, rEcmwfBase, tJavierBase, rJavierBase) {
+    function guardarSnapshotPorCiudades(fechaHoraStr, fechaISO, tSmnBase, rSmnBase, tEcmwfBase, rEcmwfBase, tJavierBase, rJavierBase) {
       const historial = obtenerHistorialGuardado();
-      if (historial.length > 0 && historial[0].fechaHora === fechaHoraStr) {
-        return;
-      }
+      if (historial.length > 0 && historial[0].fechaHora === fechaHoraStr) return;
 
       datosPuntosAMBA.forEach(p => {
         const offsetZona = (p.temp - tempRealArbitro);
@@ -1110,6 +1141,7 @@
         else if (scoreE === scoreJ) ganadorCiudad = "Empate (Javier / Open-Meteo)";
 
         historial.unshift({
+          fechaISO: fechaISO,
           fechaHora: fechaHoraStr,
           ciudad: p.nombre,
           tempReal: p.temp.toFixed(1),
@@ -1130,7 +1162,7 @@
         });
       });
 
-      localStorage.setItem(CLAVE_STORAGE, JSON.stringify(historial.slice(0, 600)));
+      localStorage.setItem(CLAVE_STORAGE, JSON.stringify(historial.slice(0, 1200)));
     }
 
     function renderizarDashboardHistorico() {
@@ -1138,10 +1170,19 @@
       const selVal = document.getElementById("selector-global-zona").value;
       const nombreCiudadFiltro = selVal === "TODAS" ? "TODAS" : puntosAMBA[Number(selVal)]?.nombre;
 
-      const filtrados = nombreCiudadFiltro === "TODAS" ? historial : historial.filter(r => r.ciudad === nombreCiudadFiltro);
+      const fDesde = document.getElementById("fecha-desde-dash").value || "2026-10-12";
+      const fHasta = document.getElementById("fecha-hasta-dash").value || "2099-12-31";
 
+      const filtrados = historial.filter(r => {
+        const cumpleCiudad = (nombreCiudadFiltro === "TODAS" || r.ciudad === nombreCiudadFiltro);
+        const fReg = r.fechaISO || "2026-10-12";
+        const cumpleFecha = (fReg >= fDesde && fReg <= fHasta);
+        return cumpleCiudad && cumpleFecha;
+      });
+
+      const etiquetaLugar = nombreCiudadFiltro === "TODAS" ? "Todo el AMBA (8 localidades)" : nombreCiudadFiltro;
       document.getElementById("dash-total-reg").innerText = filtrados.length + " registros";
-      document.getElementById("dash-ciudad-activa").innerText = nombreCiudadFiltro === "TODAS" ? "Todo el AMBA (8 localidades)" : nombreCiudadFiltro;
+      document.getElementById("dash-ciudad-activa").innerText = etiquetaLugar;
 
       let maeJT = 0, maeJR = 0, maeET = 0, maeER = 0, maeST = 0, maeSR = 0;
       let winJ = 0, winE = 0, winS = 0;
@@ -1171,6 +1212,22 @@
         document.getElementById("dash-mae-smn").innerText = "±" + maeST + " °C";
         document.getElementById("dash-rain-smn").innerText = "±" + maeSR + " mm";
         document.getElementById("dash-win-smn").innerText = winS + " aciertos";
+
+        // REDACTAR CONCLUSIÓN AUTOMÁTICA POR LOCALIDAD Y RANGO DE FECHAS
+        const ranking = [
+          { nombre: "3. Modelo Javier", errT: maeJT, errR: maeJR, wins: winJ },
+          { nombre: "2. Open-Meteo (ECMWF)", errT: maeET, errR: maeER, wins: winE },
+          { nombre: "1. Oficial SMN", errT: maeST, errR: maeSR, wins: winS }
+        ].sort((a, b) => (a.errT + a.errR) - (b.errT + b.errR));
+
+        const mejor = ranking[0], seg = ranking[1], ter = ranking[2];
+        document.getElementById("conclusion-dashboard-box").innerHTML =
+          '<div class="font-bold text-emerald-400">📌 Conclusión Automática para ' + etiquetaLugar + ' (Período: ' + fDesde + ' al ' + fHasta + '):</div>' +
+          '<div>• <strong>Modelo más preciso en Temperatura y Agua:</strong> <strong class="underline">' + mejor.nombre + '</strong> (Error medio de <strong>±' + mejor.errT + ' °C</strong> y <strong>±' + mejor.errR + ' mm</strong> en ' + filtrados.length + ' mediciones).</div>' +
+          '<div class="texto-suave text-slate-300">• <strong>Comparativa directa:</strong> Supera por <strong>' + (seg.errT - mejor.errT).toFixed(2) + ' °C</strong> a ' + seg.nombre + ' (±' + seg.errT + ' °C) y por <strong>' + (ter.errT - mejor.errT).toFixed(2) + ' °C</strong> a ' + ter.nombre + ' (±' + ter.errT + ' °C).</div>';
+      } else {
+        document.getElementById("conclusion-dashboard-box").innerHTML =
+          '<div class="text-amber-400 font-semibold">⚠️ No hay registros para el filtro de fechas seleccionado.</div>';
       }
 
       const tbody = document.getElementById("tabla-historial-body");
@@ -1237,14 +1294,14 @@
     function exportarHistorialCSV() {
       const historial = obtenerHistorialGuardado();
       if (!historial.length) return alert("Todavía no hay registros guardados.");
-      const cabeceras = "Fecha_Hora,Localidad,Temp_Real_C,Agua_Real_mm,1_SMN_Temp_C,1_SMN_Agua_mm,Desvio_SMN_C,Desvio_SMN_mm,2_OpenMeteo_Temp_C,2_OpenMeteo_Agua_mm,Desvio_OpenMeteo_C,Desvio_OpenMeteo_mm,3_ModeloJavier_Temp_C,3_ModeloJavier_Agua_mm,Desvio_Javier_C,Desvio_Javier_mm,Ganador\n";
+      const cabeceras = "Fecha_ISO,Fecha_Hora,Localidad,Temp_Real_C,Agua_Real_mm,1_SMN_Temp_C,1_SMN_Agua_mm,Desvio_SMN_C,Desvio_SMN_mm,2_OpenMeteo_Temp_C,2_OpenMeteo_Agua_mm,Desvio_OpenMeteo_C,Desvio_OpenMeteo_mm,3_ModeloJavier_Temp_C,3_ModeloJavier_Agua_mm,Desvio_Javier_C,Desvio_Javier_mm,Ganador\n";
       const filas = historial.map(r =>
-        `"${r.fechaHora}","${r.ciudad}",${r.tempReal},${r.rainReal},${r.smnTemp},${r.smnRain ?? 0},${r.errSmn},${r.errSmnRain ?? 0},${r.ecmwfTemp},${r.ecmwfRain ?? 0},${r.errEcmwf},${r.errEcmwfRain ?? 0},${r.javierTemp},${r.javierRain ?? 0},${r.errJavier},${r.errJavierRain ?? 0},"${r.ganador}"`
+        `"${r.fechaISO || '2026-10-12'}","${r.fechaHora}","${r.ciudad}",${r.tempReal},${r.rainReal},${r.smnTemp},${r.smnRain ?? 0},${r.errSmn},${r.errSmnRain ?? 0},${r.ecmwfTemp},${r.ecmwfRain ?? 0},${r.errEcmwf},${r.errEcmwfRain ?? 0},${r.javierTemp},${r.javierRain ?? 0},${r.errJavier},${r.errJavierRain ?? 0},"${r.ganador}"`
       ).join("\n");
       const blob = new Blob([cabeceras + filas], { type: "text/csv;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "auditoria_meteo_arg_pro_temp_y_agua.csv";
+      a.download = "auditoria_meteo_arg_pro_v1.csv";
       a.click();
     }
 
@@ -1257,7 +1314,7 @@
           const importados = JSON.parse(e.target.result);
           if (Array.isArray(importados)) {
             const actual = obtenerHistorialGuardado();
-            const unido = [...importados, ...actual].slice(0, 800);
+            const unido = [...importados, ...actual].slice(0, 1200);
             localStorage.setItem(CLAVE_STORAGE, JSON.stringify(unido));
             renderizarDashboardHistorico();
             alert("Se importaron " + importados.length + " registros históricos con éxito.");
@@ -1339,9 +1396,14 @@
 
       document.getElementById("c3-temp").innerText = minOur + " °C / " + maxOur + " °C";
       document.getElementById("c3-rain").innerText = "Prob. " + maxProb + "% | 🌧️ " + rainOur + " mm";
-      document.getElementById("c3-ir").innerText = topeIR + " °C (" + (topeIR < -45 ? "Factor Hydro x" + factorHydroIR.toFixed(2) : "Estable") + ")";
+
+      // Explicación clara del estado satelital sin grados bajo cero confusos
+      const txtEstadoNubes = maxCloud > 80
+        ? "🟠 Nubes altas de tormenta (Refuerzo +" + Math.round((factorHydroIR - 1) * 100) + "%)"
+        : (maxCloud > 45 ? "🟡 Nubosidad media variable" : "🟢 Cielo mayormente despejado / Nubes bajas");
+      document.getElementById("c3-ir").innerText = txtEstadoNubes;
+      document.getElementById("estado-acp-goes").innerText = txtEstadoNubes;
       document.getElementById("c3-angstrom").innerText = txtAngstrom;
-      document.getElementById("estado-acp-goes").innerText = topeIR < -52 ? "⚠️ Tope convectivo (" + topeIR + " °C)" : "Estable (" + topeIR + " °C)";
     }
 
     function renderizarMeteogramaYTabla(horaActualIdx, offsetMicroclima = 0) {
@@ -1354,9 +1416,9 @@
         const horaStr = (datosGFS.hourly.time[idx] || "").split("T")[1] || (idx % 24 + ":00");
         labels.push(horaStr);
 
-        const tE = +(Number(datosECMWF.hourly.temperature_2m[idx] ?? 15) + offsetMicroclima * 0.85).toFixed(1);
-        const tG = +(Number(datosGFS.hourly.temperature_2m[idx] ?? 15) + offsetMicroclima * 0.60).toFixed(1);
-        const tI = +(Number(datosICON.hourly.temperature_2m[idx] ?? 15) + offsetMicroclima * 0.75).toFixed(1);
+        const tE = +(Number(datosECMWF.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.85).toFixed(1);
+        const tG = +(Number(datosGFS.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.60).toFixed(1);
+        const tI = +(Number(datosICON.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.75).toFixed(1);
         const tSmnHora = +(tG + 0.4).toFixed(1);
 
         const tBMA = (tE * pesosBMA.ecmwf) + (tI * pesosBMA.icon) + (tG * pesosBMA.gfs);
@@ -1369,9 +1431,7 @@
         const rI = Number(datosICON.hourly.precipitation[idx] ?? 0);
         const rConsenso = +((rE * pesosBMA.ecmwf) + (rI * pesosBMA.icon) + (rG * pesosBMA.gfs)).toFixed(1);
 
-        rainSMN.push(rG);
-        rainE.push(rE);
-        rainJavier.push(rConsenso);
+        rainSMN.push(rG); rainE.push(rE); rainJavier.push(rConsenso);
 
         const prob = Number((datosGFS.hourly.precipitation_probability || [])[idx] ?? 0);
         const wind = Number((datosGFS.hourly.wind_speed_10m || [])[idx] ?? 12).toFixed(0);
@@ -1391,7 +1451,6 @@
       }
 
       document.getElementById("tira-horaria").innerHTML = tiraHTML.join("");
-
       if (seccionActiva !== 'seccion-pronostico') return;
 
       const ctx = document.getElementById("graficoMeteograma").getContext("2d");
@@ -1455,53 +1514,31 @@
           : "text-xs px-3 py-1.5 rounded-lg font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700";
       });
 
-      capaElementosMapa.clearLayers();
-      if (map.hasLayer(nasaLayer)) map.removeLayer(nasaLayer);
-      if (radarLayer && map.hasLayer(radarLayer)) map.removeLayer(radarLayer);
-
-      const barraGrad = document.getElementById("barra-gradiente-leyenda");
-      const txtEscala = document.getElementById("texto-escala-leyenda");
-
-      if (modo === 'temp') {
-        barraGrad.style.background = "linear-gradient(90deg, #0284c7, #10b981, #eab308, #ef4444)";
-        txtEscala.innerText = "Campo Térmico: Azul (<10°C) → Verde (15°C) → Amarillo (21°C) → Rojo (>27°C)";
-      } else if (modo === 'rain') {
-        if (radarLayer) radarLayer.addTo(map);
-        barraGrad.style.background = "linear-gradient(90deg, #1e293b, #0284c7, #6366f1, #d946ef)";
-        txtEscala.innerText = "Campo de Agua + Radar en Vivo: Gris (0 mm) → Azul (Débil) → Violeta (Fuerte)";
-      } else if (modo === 'wind') {
-        barraGrad.style.background = "linear-gradient(90deg, #14b8a6, #eab308, #ef4444)";
-        txtEscala.innerText = "Campo de Viento: Turquesa (Calmo) → Amarillo (>25 km/h) → Rojo (>45 km/h)";
-      } else if (modo === 'hum') {
-        barraGrad.style.background = "linear-gradient(90deg, #bae6fd, #0284c7, #1e3a8a)";
-        txtEscala.innerText = "Humedad Relativa: Celeste claro (Seco) → Azul profundo (>80% húmedo)";
-      } else if (modo === 'sat') {
-        nasaLayer.addTo(map);
-        barraGrad.style.background = "linear-gradient(90deg, #0f172a, #64748b, #f8fafc)";
-        txtEscala.innerText = "Imagen Satelital NASA GIBS + Cobertura de nubes (%)";
-      } else if (modo === 'fire') {
-        barraGrad.style.background = "linear-gradient(90deg, #10b981, #eab308, #ef4444)";
-        txtEscala.innerText = "Peligro de Incendio: Verde (Bajo riesgo) → Amarillo (Moderado) → Rojo (Crítico)";
+      if (modo === 'fire' && motorMapaActivo === 'windy') {
+        cambiarMotorMapa('leaflet');
+      } else {
+        actualizarIframeWindy(modo);
       }
 
+      capaElementosMapa.clearLayers();
       capaPinturaContinua._redraw();
 
       datosPuntosAMBA.forEach(p => {
         let textoEtiqueta = "";
-        if (modo === 'temp') textoEtiqueta = "🌡️ " + p.temp.toFixed(1) + "°C | 🌧️ " + p.rain.toFixed(1) + "mm";
+        if (modo === 'temp') textoEtiqueta = "🌡️ " + p.temp.toFixed(1) + "°C";
         else if (modo === 'wind') textoEtiqueta = flechaDireccionViento(p.dir) + " " + p.wind.toFixed(0) + " km/h";
         else if (modo === 'rain') textoEtiqueta = "🌧️ " + p.rain.toFixed(1) + " mm";
         else if (modo === 'hum') textoEtiqueta = "💧 " + p.hum + "%";
-        else if (modo === 'sat') textoEtiqueta = "☁️ " + p.clouds + "% nubes";
+        else if (modo === 'sat') textoEtiqueta = "☁️ " + p.clouds + "%";
         else if (modo === 'fire') {
           const indA = calcularIndiceAngstrom(p.temp, p.hum, p.wind);
-          textoEtiqueta = "🔥 " + (indA < 2.5 ? "CRÍTICO" : (indA < 4.0 ? "MODERADO" : "BAJO"));
+          textoEtiqueta = "🔥 " + (indA < 2.5 ? "CRÍTICO" : (indA < 4.0 ? "MOD" : "BAJO"));
         }
 
         const icono = L.divIcon({
           className: "",
           html: '<div class="etiqueta-mapa">' + textoEtiqueta + '</div>',
-          iconSize: [120, 24], iconAnchor: [60, 12]
+          iconSize: [86, 22], iconAnchor: [43, 11]
         });
         L.marker([p.lat, p.lon], { icon: icono }).addTo(capaElementosMapa).bindPopup(
           "<b>📍 " + p.nombre + "</b><br><span style='font-size:11px;color:#64748b;'>🕒 " + p.horaDato + "</span><hr style='margin:4px 0;border-color:#334155;'>" +
@@ -1510,9 +1547,7 @@
       });
     }
 
-    // 1. Pintar datos garantizados al instante (0.1 seg) para que ningún cuadro ni gráfico esté vacío
     inicializarDatosBaseInmediatos();
-    // 2. Actualizar en segundo plano con las APIs en vivo y cada 15 minutos
     cargarDatosEnVivoAMBA(false);
     setInterval(() => cargarDatosEnVivoAMBA(false), 15 * 60 * 1000);
   </script>

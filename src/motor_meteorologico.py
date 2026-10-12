@@ -84,7 +84,7 @@ def ejecutar_auditoria_amba():
             ganador = "1. Oficial SMN"
 
         historial.insert(0, {
-            "fechaHora": fecha_str,
+            "fechaISO": ahora.strftime("%Y-%m-%d"), "fechaHora": fecha_str,
             "ciudad": p["nombre"],
             "tempReal": f"{t_real:.1f}",
             "rainReal": f"{r_real:.1f}",
@@ -109,4 +109,5 @@ def ejecutar_auditoria_amba():
 
 if __name__ == "__main__":
     ejecutar_auditoria_amba()
+
 
