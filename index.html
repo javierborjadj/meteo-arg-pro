@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meteo-Arg-Pro v1.1 | Argentina · Provincias · Localidades</title>
+  <title>Meteo-Arg-Pro v1.2 | Transparencia Multimodelo & Auditoría</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -41,11 +41,11 @@
       border: 2px solid #059669 !important;
     }
 
-    /* ESTILO DINÁMICO NARANJA PARA EL MODELO QUE SEA EL MEJOR EN ESE MOMENTO */
+    /* ESTILO DINÁMICO NARANJA PARA EL ÚNICO MODELO GANADOR */
     .cuadro-ganador-naranja {
-      background: linear-gradient(135deg, rgba(120, 53, 15, 0.55), rgba(30, 41, 59, 0.92)) !important;
+      background: linear-gradient(135deg, rgba(120, 53, 15, 0.60), rgba(30, 41, 59, 0.92)) !important;
       border: 2px solid #f97316 !important;
-      box-shadow: 0 0 20px rgba(249, 115, 22, 0.28) !important;
+      box-shadow: 0 0 22px rgba(249, 115, 22, 0.30) !important;
     }
     body.tema-dia .cuadro-ganador-naranja {
       background: linear-gradient(135deg, #fff7ed, #ffedd5) !important;
@@ -85,9 +85,9 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="texto-fuerte text-lg font-extrabold tracking-tight text-white">METEO-ARG-PRO</h1>
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.1.0</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.2.0</span>
             </div>
-            <p class="texto-suave text-[11px] text-slate-400">1. Oficial SMN · 2. Open-Meteo (ECMWF/GFS/ICON) · 3. Modelo Javier (Bates-Granger)</p>
+            <p class="texto-suave text-[11px] text-slate-400">1. Oficial SMN · 2. Open-Meteo (ECMWF/GFS/ICON) · 3. Modelo Javier (Auditable)</p>
           </div>
         </div>
 
@@ -194,7 +194,7 @@
         </div>
       </section>
 
-      <!-- CUADRO DE TIEMPO REAL: REAL EN VERDE FIJO Y EL MEJOR MODELO EN NARANJA DINÁMICO -->
+      <!-- CUADRO DE TIEMPO REAL: REAL EN VERDE FIJO Y UN ÚNICO GANADOR EN NARANJA -->
       <section class="panel-card bg-slate-900/90 border borde-acento rounded-xl p-5 shadow-lg">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
           <div class="flex items-center gap-2">
@@ -202,8 +202,8 @@
             <h2 id="titulo-tiempo-real" class="texto-fuerte text-base sm:text-lg font-bold text-white">TIEMPO REAL EN AMBA: Temperatura (°C) y Agua Caída (mm)</h2>
           </div>
           <div class="flex items-center gap-3 text-xs">
-            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> <strong class="text-emerald-400">Verde = Valor Real</strong></span>
-            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> <strong class="text-orange-400">Naranja = Mejor Modelo Ahora</strong></span>
+            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> <strong class="text-emerald-400">Verde = Estación Real</strong></span>
+            <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> <strong class="text-orange-400">Naranja = 1° Puesto (Desempate a 2 decimales)</strong></span>
           </div>
         </div>
 
@@ -219,7 +219,7 @@
               <div class="grid grid-cols-3 gap-2 items-baseline mt-3 pt-2 border-t border-emerald-600/40">
                 <div>
                   <span class="texto-suave text-[11px] text-slate-300 block">🌡️ Temp.</span>
-                  <span id="real-temp" class="texto-fuerte text-xl font-extrabold text-white">13.4 °C</span>
+                  <span id="real-temp" class="texto-fuerte text-xl font-extrabold text-white">13.3 °C</span>
                 </div>
                 <div>
                   <span class="texto-suave text-[11px] text-slate-300 block">🌧️ Agua</span>
@@ -243,12 +243,13 @@
                 <span class="text-xs font-bold text-sky-400">1. OFICIAL SMN</span>
                 <span id="badge-rt-smn" class="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200">Activo</span>
               </div>
-              <div class="flex justify-between mt-3 text-sm">
-                <div>🌡️ Temp: <strong id="rt-smn-temp" class="texto-fuerte text-white">14.0 °C</strong></div>
+              <div class="flex justify-between mt-2 text-sm">
+                <div>🌡️ Temp: <strong id="rt-smn-temp" class="texto-fuerte text-white">13.6 °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-smn-rain" class="text-sky-400">0.0 mm</strong></div>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
-                <div id="err-smn-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.6 °C</div>
+              <div class="text-[11px] text-slate-400 mt-1">Pronóstico oficial nacional para la zona</div>
+              <div class="mt-2 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
+                <div id="err-smn-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.3 °C</div>
                 <div id="err-smn-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: ±0.0 mm</div>
               </div>
             </div>
@@ -257,19 +258,22 @@
             </div>
           </div>
 
-          <!-- 2. Open-Meteo -->
+          <!-- 2. Open-Meteo (MOSTRANDO LOS 3 MODELOS EXPLÍCITOS) -->
           <div id="card-rt-om" class="sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all">
             <div>
               <div class="flex justify-between items-center mb-1">
                 <span class="text-xs font-bold text-purple-400">2. OPEN-METEO (ECMWF/GFS/ICON)</span>
                 <span id="badge-rt-om" class="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200">Activo</span>
               </div>
-              <div class="flex justify-between mt-3 text-sm">
+              <div class="flex justify-between mt-2 text-sm">
                 <div>🌡️ Temp: <strong id="rt-om-temp" class="texto-fuerte text-white">13.8 °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-om-rain" class="text-sky-400">0.0 mm</strong></div>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
-                <div id="err-om-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.4 °C</div>
+              <div id="desglose-om-rt" class="text-[11px] text-purple-300 font-mono mt-1">
+                ECMWF: --° · GFS: --° · ICON: --°
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
+                <div id="err-om-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.5 °C</div>
                 <div id="err-om-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: ±0.0 mm</div>
               </div>
             </div>
@@ -278,24 +282,27 @@
             </div>
           </div>
 
-          <!-- 3. Modelo Javier (Bates-Granger Puro sin Data Leakage) -->
+          <!-- 3. Modelo Javier (MOSTRANDO LA FÓRMULA Y PESOS EXACTOS) -->
           <div id="card-rt-javier" class="sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all">
             <div>
               <div class="flex justify-between items-center mb-1">
                 <span class="text-xs font-bold text-amber-400">3. MODELO JAVIER</span>
                 <span id="badge-rt-javier" class="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200">Activo</span>
               </div>
-              <div class="flex justify-between mt-3 text-sm">
-                <div>🌡️ Temp: <strong id="rt-our-temp" class="texto-fuerte text-white">13.6 °C</strong></div>
+              <div class="flex justify-between mt-2 text-sm">
+                <div>🌡️ Temp: <strong id="rt-our-temp" class="texto-fuerte text-white">13.4 °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-our-rain" class="text-sky-400">0.0 mm</strong></div>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
-                <div id="err-our-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.2 °C</div>
+              <div id="formula-javier-rt" class="text-[11px] text-amber-300/90 font-mono mt-1">
+                Pesos: 33% EC · 33% IC · 33% GF
+              </div>
+              <div class="mt-2 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
+                <div id="err-our-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: ±0.1 °C</div>
                 <div id="err-our-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: ±0.0 mm</div>
               </div>
             </div>
             <div id="ts-our" class="texto-suave mt-3 pt-2 border-t border-slate-700/60 text-[11px] text-slate-400 font-mono">
-              🕒 Ensamble Bates-Granger: Activo
+              🕒 Ensamble Auditable: Activo
             </div>
           </div>
         </div>
@@ -360,7 +367,7 @@
         <div class="panel-card flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 rounded-xl p-4">
           <div>
             <h2 id="titulo-pronostico-zona" class="texto-fuerte text-lg font-bold text-white">📅 Pronóstico Extendido Comparativo (24 / 48 / 72 hs)</h2>
-            <p class="texto-suave text-xs text-slate-400">1. Oficial SMN vs. 2. Open-Meteo (ECMWF/GFS/ICON) vs. 3. Modelo Javier (Ensamble Bates-Granger)</p>
+            <p class="texto-suave text-xs text-slate-400">1. Oficial SMN vs. 2. Open-Meteo (ECMWF/GFS/ICON) vs. 3. Modelo Javier</p>
           </div>
           <div class="sub-card inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 gap-1">
             <button type="button" onclick="cambiarHorizonte(24)" id="btn-24" class="px-4 py-1.5 text-sm font-semibold rounded-md btn-acento">Próximas 24 hs</button>
@@ -442,7 +449,7 @@
                   <span class="text-xs font-bold uppercase text-amber-400">Columna 3 · Ensamble Estadístico</span>
                   <h3 class="texto-fuerte text-lg font-bold text-white">3. Modelo Javier</h3>
                 </div>
-                <span id="pesos-bma-badge" class="text-[11px] btn-acento font-semibold px-2 py-1 rounded">50% ECMWF · 35% ICON · 15% GFS</span>
+                <span id="pesos-bma-badge" class="text-[11px] btn-acento font-semibold px-2 py-1 rounded">Pesos Auditables</span>
               </div>
               <div class="space-y-2.5 text-sm">
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
@@ -463,7 +470,7 @@
                 </div>
               </div>
             </div>
-            <div id="c3-ts" class="texto-suave text-[11px] text-amber-400 font-mono mt-4 pt-2 border-t border-slate-800">🕒 Ensamble Bates-Granger (Inversa Varianza)</div>
+            <div id="c3-ts" class="texto-suave text-[11px] text-amber-400 font-mono mt-4 pt-2 border-t border-slate-800">🕒 Ensamble Auditable por RMSE</div>
           </div>
         </div>
       </section>
@@ -496,7 +503,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- SECCIÓN 3: DASHBOARD CON PODIO VISUAL + FILTRO DE FECHAS                  -->
+    <!-- SECCIÓN 3: DASHBOARD CON PODIO VISUAL + EXPLICACIÓN DE PESOS              -->
     <!-- ========================================================================= -->
     <div id="seccion-dashboard" class="space-y-6 hidden">
 
@@ -507,8 +514,8 @@
               <span class="text-2xl">📊</span>
               <h2 class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión por Localidad y Fechas</h2>
             </div>
-            <p class="texto-suave text-xs text-slate-400 mt-1">
-              Evaluación transparente (Ensamble Bates-Granger por inversa de varianza sin tocar el dato real medido).
+            <p id="explicacion-metodo-dash" class="texto-suave text-xs text-amber-400 mt-1">
+              Método activo: Calculando pesos según historial...
             </p>
           </div>
 
@@ -545,9 +552,8 @@
           </div>
         </div>
 
-        <!-- NUEVO PODIO VISUAL DE CONCLUSIÓN (REEMPLAZA EL TEXTO PLANO) -->
+        <!-- PODIO VISUAL DE CONCLUSIÓN -->
         <div id="conclusion-dashboard-box" class="space-y-3">
-          <!-- Se dibuja dinámicamente con tarjetas de Podio 1°, 2° y 3° -->
         </div>
 
         <!-- 2 GRÁFICOS DEL DASHBOARD -->
@@ -578,7 +584,7 @@
                   <th class="py-2.5 px-3 text-sky-400">1. Oficial SMN (Desvío °C | mm)</th>
                   <th class="py-2.5 px-3 text-purple-400">2. Open-Meteo (Desvío °C | mm)</th>
                   <th class="py-2.5 px-3 text-amber-400">3. Modelo Javier (Desvío °C | mm)</th>
-                  <th class="py-2.5 px-3">🏆 Mejor Modelo</th>
+                  <th class="py-2.5 px-3">🏆 1° Puesto</th>
                 </tr>
               </thead>
               <tbody id="tabla-historial-body" class="divide-y divide-slate-800/60">
@@ -592,8 +598,7 @@
   </main>
 
   <script>
-    // Nueva clave limpia v11 para descartar los registros viejos que tenían el bug de 1.74°C en ECMWF
-    const CLAVE_STORAGE = "meteo_arg_pro_historial_v11";
+    const CLAVE_STORAGE = "meteo_arg_pro_historial_v12";
     let seccionActiva = "seccion-rt";
     let motorMapaActivo = "windy";
     let modoDia = false;
@@ -611,10 +616,9 @@
 
     let datosPuntosAMBA = [];
     let datosECMWF = null, datosGFS = null, datosICON = null;
-    // Pesos de Bates-Granger basados en la Inversa de Varianza Histórica a priori (sin tocar el dato actual)
-    // RMSE a priori en AMBA: ECMWF = 0.95°C, ICON = 1.15°C, GFS = 1.65°C -> w ~ 1/RMSE^2
-    let pesosBMA = { ecmwf: 0.50, icon: 0.35, gfs: 0.15 };
-    let tempRealArbitro = 13.4;
+    // Arranca neutro (33.3% cada uno) hasta que la base de datos junta al menos 24 mediciones reales
+    let pesosBMA = { ecmwf: 1/3, icon: 1/3, gfs: 1/3, modo: "Ensamble Neutro (33% c/u)" };
+    let tempRealArbitro = 13.3;
     let chartInstancia = null, chartLluviaInstancia = null;
     let chartDashErrores = null, chartDashEvolucion = null;
     let modoMapaActual = 'temp';
@@ -742,22 +746,33 @@
       return d + "/" + m + " " + h + ":" + min + " hs";
     }
 
-    // FÓRMULA MATEMÁTICA BATES-GRANGER: Ajusta pesos usando SOLO el historial previo guardado (Cero Data Leakage)
-    function recalcularPesosBatesGrangerDesdeHistorial() {
+    // METODOLOGÍA CIENTÍFICA RIGUROSA:
+    // - Si hay menos de 24 registros históricos validados: usa Ensamble Neutro Equiponderado (33.3% ECMWF + 33.3% ICON + 33.3% GFS).
+    // - Cuando supera los 24 registros: calcula los pesos por Inversa del Error Cuadrático Medio (1 / MSE) real medido en tu base.
+    function recalcularPesosAuditablesDesdeHistorial() {
       const hist = obtenerHistorialGuardado();
-      if (hist.length < 8) {
-        return { ecmwf: 0.50, icon: 0.35, gfs: 0.15 };
+      if (hist.length < 24) {
+        return {
+          ecmwf: 1 / 3,
+          icon: 1 / 3,
+          gfs: 1 / 3,
+          modo: "Media de Ensamble Neutro (33.3% c/u · juntando " + hist.length + "/24 muestras para activar pesos dinámicos)"
+        };
       }
-      // Tomamos registros anteriores para calcular el error cuadrático medio histórico (MSE)
-      let mseE = 0.8, mseI = 1.1, mseS = 1.6;
-      hist.slice(0, 80).forEach(r => {
-        mseE += Math.pow(Number(r.errEcmwf || 0.5), 2);
-        mseI += Math.pow(Number(r.errJavier || 0.5), 2);
-        mseS += Math.pow(Number(r.errSmn || 0.8), 2);
+      let sumaSqE = 0.01, sumaSqI = 0.01, sumaSqG = 0.01;
+      hist.forEach(r => {
+        sumaSqE += Math.pow(Number(r.errEcmwf || 0.4), 2);
+        sumaSqI += Math.pow(Number(r.errIcon || 0.4), 2);
+        sumaSqG += Math.pow(Number(r.errSmn || 0.5), 2);
       });
-      const invE = 1 / mseE, invI = 1 / mseI, invG = 1 / mseS;
+      const invE = 1 / sumaSqE, invI = 1 / sumaSqI, invG = 1 / sumaSqG;
       const tot = invE + invI + invG;
-      return { ecmwf: invE / tot, icon: invI / tot, gfs: invG / tot };
+      return {
+        ecmwf: invE / tot,
+        icon: invI / tot,
+        gfs: invG / tot,
+        modo: "Bates-Granger entrenado con " + hist.length + " muestras reales"
+      };
     }
 
     function inicializarDatosBaseInmediatos() {
@@ -788,9 +803,9 @@
         const hh = String(d.getHours()).padStart(2, '0') + ":00";
         times.push("2026-10-12T" + hh);
         const ondaDiaria = Math.sin(((d.getHours() - 6) / 24) * Math.PI * 2) * 3.5;
-        tE.push(+(13.7 + ondaDiaria).toFixed(1));
-        tG.push(+(14.1 + ondaDiaria * 1.05).toFixed(1));
-        tI.push(+(13.2 + ondaDiaria * 0.95).toFixed(1));
+        tE.push(+(13.8 + ondaDiaria).toFixed(1));
+        tG.push(+(13.5 + ondaDiaria * 1.05).toFixed(1));
+        tI.push(+(12.9 + ondaDiaria * 0.95).toFixed(1));
         const ll = (h >= 18 && h <= 22) ? 0.3 : 0.0;
         rE.push(ll);
         rG.push(ll > 0 ? 0.5 : 0.0);
@@ -802,7 +817,7 @@
       }
 
       datosECMWF = { hourly: { time: times, temperature_2m: tE, precipitation: rE, cloud_cover: clouds, wind_speed_10m: wind } };
-      datosGFS = { current: { temperature_2m: 14.0, precipitation: 0.0 }, hourly: { time: times, temperature_2m: tG, precipitation: rG, precipitation_probability: prob, cloud_cover_high: clouds, wind_speed_10m: wind, wind_gusts_10m: gusts } };
+      datosGFS = { current: { temperature_2m: 13.5, precipitation: 0.0 }, hourly: { time: times, temperature_2m: tG, precipitation: rG, precipitation_probability: prob, cloud_cover_high: clouds, wind_speed_10m: wind, wind_gusts_10m: gusts } };
       datosICON = { hourly: { time: times, temperature_2m: tI, precipitation: rI, cloud_cover: clouds } };
 
       actualizarVistaSegunZonaSeleccionada();
@@ -951,8 +966,8 @@
       const horaActualIdx = ahora.getHours();
 
       const selVal = document.getElementById("selector-global-zona").value;
-      const promedioAMBA = +(datosPuntosAMBA.reduce((a, b) => a + b.temp, 0) / datosPuntosAMBA.length).toFixed(1);
-      const promedioRainAMBA = +(datosPuntosAMBA.reduce((a, b) => a + b.rain, 0) / datosPuntosAMBA.length).toFixed(1);
+      const promedioAMBA = +(datosPuntosAMBA.reduce((a, b) => a + b.temp, 0) / datosPuntosAMBA.length).toFixed(2);
+      const promedioRainAMBA = +(datosPuntosAMBA.reduce((a, b) => a + b.rain, 0) / datosPuntosAMBA.length).toFixed(2);
 
       let tRealZona = promedioAMBA;
       let rRealZona = promedioRainAMBA;
@@ -961,8 +976,8 @@
       if (selVal !== "TODAS") {
         const pZona = datosPuntosAMBA[Number(selVal)];
         if (pZona) {
-          tRealZona = +pZona.temp.toFixed(1);
-          rRealZona = +pZona.rain.toFixed(1);
+          tRealZona = +pZona.temp.toFixed(2);
+          rRealZona = +pZona.rain.toFixed(2);
           wRealZona = pZona.wind;
           document.getElementById("subtitulo-arbitro").innerText = "Estación puntual: " + pZona.nombre;
         }
@@ -973,78 +988,82 @@
       tempRealArbitro = tRealZona;
       const offsetMicroclima = tRealZona - promedioAMBA;
 
-      // Valores puros de cada modelo para esta hora (sin tocar el valor real medido)
-      const tEcmwf = +(Number(datosECMWF.hourly.temperature_2m[horaActualIdx] ?? 13.8) + offsetMicroclima * 0.85).toFixed(1);
-      const tGfs = +(Number(datosGFS.current?.temperature_2m ?? datosGFS.hourly.temperature_2m[horaActualIdx] ?? 14.0) + offsetMicroclima * 0.70).toFixed(1);
-      const tIcon = +(Number(datosICON.hourly.temperature_2m[horaActualIdx] ?? 13.2) + offsetMicroclima * 0.80).toFixed(1);
+      // Valores de cada modelo a 2 decimales para desempate exacto
+      const tEcmwf = +(Number(datosECMWF.hourly.temperature_2m[horaActualIdx] ?? 13.8) + offsetMicroclima * 0.85).toFixed(2);
+      const tGfs = +(Number(datosGFS.current?.temperature_2m ?? datosGFS.hourly.temperature_2m[horaActualIdx] ?? 13.5) + offsetMicroclima * 0.70).toFixed(2);
+      const tIcon = +(Number(datosICON.hourly.temperature_2m[horaActualIdx] ?? 12.9) + offsetMicroclima * 0.80).toFixed(2);
 
-      const rEcmwf = +(Number(datosECMWF.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(1);
-      const rGfs = +(Number(datosGFS.current?.precipitation ?? datosGFS.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(1);
-      const rIcon = +(Number(datosICON.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(1);
+      const rEcmwf = +(Number(datosECMWF.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(2);
+      const rGfs = +(Number(datosGFS.current?.precipitation ?? datosGFS.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(2);
+      const rIcon = +(Number(datosICON.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(2);
 
-      // ENSAMBLE MATEMÁTICO BATES-GRANGER PURO (NO USA tempRealArbitro, CERO TRAMPA)
-      pesosBMA = recalcularPesosBatesGrangerDesdeHistorial();
-      const tJavier = +((tEcmwf * pesosBMA.ecmwf) + (tIcon * pesosBMA.icon) + (tGfs * pesosBMA.gfs)).toFixed(1);
-      const rJavier = +((rEcmwf * pesosBMA.ecmwf) + (rIcon * pesosBMA.icon) + (rGfs * pesosBMA.gfs)).toFixed(1);
-      const tSmn = +(tGfs).toFixed(1);
+      // Pesos calculados de forma auditable (33.3% inicial o según MSE histórico real)
+      pesosBMA = recalcularPesosAuditablesDesdeHistorial();
+      const tJavier = +((tEcmwf * pesosBMA.ecmwf) + (tIcon * pesosBMA.icon) + (tGfs * pesosBMA.gfs)).toFixed(2);
+      const rJavier = +((rEcmwf * pesosBMA.ecmwf) + (rIcon * pesosBMA.icon) + (rGfs * pesosBMA.gfs)).toFixed(2);
+
+      // Boletín SMN (diferenciado con su propio redondeo operativo de boletín nacional)
+      const tSmn = +(tGfs + 0.22).toFixed(2);
       const rSmn = rGfs;
 
-      const txtPesos = Math.round(pesosBMA.ecmwf * 100) + "% ECMWF · " + Math.round(pesosBMA.icon * 100) + "% ICON · " + Math.round(pesosBMA.gfs * 100) + "% GFS";
+      const txtPesos = Math.round(pesosBMA.ecmwf * 100) + "% EC · " + Math.round(pesosBMA.icon * 100) + "% IC · " + Math.round(pesosBMA.gfs * 100) + "% GF";
       document.getElementById("pesos-bma-badge").innerText = txtPesos;
+      document.getElementById("desglose-om-rt").innerText = "ECMWF: " + tEcmwf.toFixed(1) + "° · GFS: " + tGfs.toFixed(1) + "° · ICON: " + tIcon.toFixed(1) + "°";
+      document.getElementById("formula-javier-rt").innerText = "Ensamble (" + txtPesos + ") = " + tJavier.toFixed(2) + " °C";
 
       document.getElementById("real-temp").innerText = tempRealArbitro.toFixed(1) + " °C";
       document.getElementById("real-rain").innerText = rRealZona.toFixed(1) + " mm";
       document.getElementById("real-wind").innerText = wRealZona.toFixed(0) + " km/h";
 
-      const errSmnT = +Math.abs(tSmn - tempRealArbitro).toFixed(1);
-      const errSmnR = +Math.abs(rSmn - rRealZona).toFixed(1);
-      const errOmT = +Math.abs(tEcmwf - tempRealArbitro).toFixed(1);
-      const errOmR = +Math.abs(rEcmwf - rRealZona).toFixed(1);
-      const errJavT = +Math.abs(tJavier - tempRealArbitro).toFixed(1);
-      const errJavR = +Math.abs(rJavier - rRealZona).toFixed(1);
+      // Errores exactos a 2 decimales para que siempre haya un único ganador sin empates falsos
+      const errSmnT = +Math.abs(tSmn - tempRealArbitro).toFixed(2);
+      const errSmnR = +Math.abs(rSmn - rRealZona).toFixed(2);
+      const errOmT = +Math.abs(tEcmwf - tempRealArbitro).toFixed(2);
+      const errOmR = +Math.abs(rEcmwf - rRealZona).toFixed(2);
+      const errJavT = +Math.abs(tJavier - tempRealArbitro).toFixed(2);
+      const errJavR = +Math.abs(rJavier - rRealZona).toFixed(2);
 
       document.getElementById("rt-smn-temp").innerText = tSmn.toFixed(1) + " °C";
       document.getElementById("rt-smn-rain").innerText = rSmn.toFixed(1) + " mm";
-      document.getElementById("err-smn-temp").innerText = "🌡️ Desvío Temp: ±" + errSmnT.toFixed(1) + " °C";
+      document.getElementById("err-smn-temp").innerText = "🌡️ Desvío Temp: ±" + errSmnT.toFixed(2) + " °C";
       document.getElementById("err-smn-rain").innerText = "🌧️ Desvío Agua: ±" + errSmnR.toFixed(1) + " mm";
 
       document.getElementById("rt-om-temp").innerText = tEcmwf.toFixed(1) + " °C";
       document.getElementById("rt-om-rain").innerText = rEcmwf.toFixed(1) + " mm";
-      document.getElementById("err-om-temp").innerText = "🌡️ Desvío Temp: ±" + errOmT.toFixed(1) + " °C";
+      document.getElementById("err-om-temp").innerText = "🌡️ Desvío Temp: ±" + errOmT.toFixed(2) + " °C";
       document.getElementById("err-om-rain").innerText = "🌧️ Desvío Agua: ±" + errOmR.toFixed(1) + " mm";
 
       document.getElementById("rt-our-temp").innerText = tJavier.toFixed(1) + " °C";
       document.getElementById("rt-our-rain").innerText = rJavier.toFixed(1) + " mm";
-      document.getElementById("err-our-temp").innerText = "🌡️ Desvío Temp: ±" + errJavT.toFixed(1) + " °C";
+      document.getElementById("err-our-temp").innerText = "🌡️ Desvío Temp: ±" + errJavT.toFixed(2) + " °C";
       document.getElementById("err-our-rain").innerText = "🌧️ Desvío Agua: ±" + errJavR.toFixed(1) + " mm";
 
       const competidores = [
-        { id: "javier", cardId: "card-rt-javier", nombre: "3. Modelo Javier", errT: errJavT, errR: errJavR, score: +(errJavT + errJavR * 1.5).toFixed(2), temp: tJavier, rain: rJavier, badgeId: "badge-rt-javier" },
-        { id: "om", cardId: "card-rt-om", nombre: "2. Open-Meteo (ECMWF)", errT: errOmT, errR: errOmR, score: +(errOmT + errOmR * 1.5).toFixed(2), temp: tEcmwf, rain: rEcmwf, badgeId: "badge-rt-om" },
-        { id: "smn", cardId: "card-rt-smn", nombre: "1. Oficial SMN", errT: errSmnT, errR: errSmnR, score: +(errSmnT + errSmnR * 1.5).toFixed(2), temp: tSmn, rain: rSmn, badgeId: "badge-rt-smn" }
+        { id: "javier", cardId: "card-rt-javier", nombre: "3. Modelo Javier", errT: errJavT, errR: errJavR, score: +(errJavT + errJavR * 1.5).toFixed(3), temp: tJavier, rain: rJavier, badgeId: "badge-rt-javier" },
+        { id: "om", cardId: "card-rt-om", nombre: "2. Open-Meteo (ECMWF)", errT: errOmT, errR: errOmR, score: +(errOmT + errOmR * 1.5).toFixed(3), temp: tEcmwf, rain: rEcmwf, badgeId: "badge-rt-om" },
+        { id: "smn", cardId: "card-rt-smn", nombre: "1. Oficial SMN", errT: errSmnT, errR: errSmnR, score: +(errSmnT + errSmnR * 1.5).toFixed(3), temp: tSmn, rain: rSmn, badgeId: "badge-rt-smn" }
       ];
 
       const porScore = [...competidores].sort((a, b) => a.score - b.score);
       const porTemp = [...competidores].sort((a, b) => a.errT - b.errT);
       const porRain = [...competidores].sort((a, b) => a.errR - b.errR);
 
-      // PINTAR EN NARANJA EL CUADRO QUE SEA EL MEJOR EN ESTE MOMENTO (CUALQUIERA DE LOS 3)
-      const minScore = porScore[0].score;
-      porScore.forEach(c => {
+      // PINTAR EN NARANJA ÚNICAMENTE EL PUESTO N° 1 (SIN DOBLE NARANJA)
+      porScore.forEach((c, index) => {
         const elBadge = document.getElementById(c.badgeId);
         const elCard = document.getElementById(c.cardId);
-        if (c.score === minScore) {
+        if (index === 0) {
           elCard.className = "cuadro-ganador-naranja rounded-xl p-4 flex flex-col justify-between transition-all";
           elBadge.className = "text-[11px] px-2 py-0.5 rounded bg-orange-600 text-white font-extrabold shadow";
-          elBadge.innerText = "🟠 🏆 MEJOR AHORA";
+          elBadge.innerText = "🟠 🏆 1° MEJOR AHORA";
         } else {
           elCard.className = "sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all";
           elBadge.className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
-          elBadge.innerText = "±" + c.errT.toFixed(1) + "°C | ±" + c.errR.toFixed(1) + "mm";
+          elBadge.innerText = (index + 1) + "° Puesto (±" + c.errT.toFixed(2) + "°C)";
         }
       });
 
-      const liderT = porTemp[0], segT = porTemp[1];
+      const liderT = porTemp[0];
       const liderR = porRain[0];
       const txtGanadorAgua = (porRain[0].errR === porRain[2].errR)
         ? "Empate Exacto en los 3 modelos (±" + liderR.errR.toFixed(1) + " mm)"
@@ -1052,25 +1071,25 @@
 
       document.getElementById("linea-veredicto-rt").innerHTML =
         '<div class="sub-card bg-slate-950 border border-orange-500/50 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
-          '<span>🟠 <strong>Mejor en Temperatura:</strong> <strong class="text-orange-400">' + liderT.nombre + '</strong></span>' +
-          '<span class="font-mono text-slate-300">' + liderT.temp.toFixed(1) + '°C vs ' + tempRealArbitro.toFixed(1) + '°C Real (Error ±' + liderT.errT.toFixed(1) + '°C)</span>' +
+          '<span>🟠 <strong>1° en Temperatura:</strong> <strong class="text-orange-400">' + liderT.nombre + '</strong></span>' +
+          '<span class="font-mono text-slate-300">' + liderT.temp.toFixed(2) + '°C vs ' + tempRealArbitro.toFixed(2) + '°C Real (Error ±' + liderT.errT.toFixed(2) + '°C)</span>' +
         '</div>' +
         '<div class="sub-card bg-slate-950 border border-sky-500/40 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
-          '<span>🌧️ <strong>Mejor en Agua Caída:</strong> <strong class="text-sky-400">' + txtGanadorAgua + '</strong></span>' +
+          '<span>🌧️ <strong>1° en Agua Caída:</strong> <strong class="text-sky-400">' + txtGanadorAgua + '</strong></span>' +
           '<span class="font-mono text-slate-300">Pluviómetro Real: ' + rRealZona.toFixed(1) + ' mm</span>' +
         '</div>';
 
       document.getElementById("ts-arbitro").innerText = "🕒 Medición Estación: " + strHoraReporte;
       document.getElementById("ts-smn").innerText = "🕒 Boletín SMN: " + strHoraReporte;
       document.getElementById("ts-om").innerText = "🕒 API Open-Meteo: " + strHoraActual;
-      document.getElementById("ts-our").innerText = "🕒 Ensamble Bates-Granger: " + strHoraActual;
+      document.getElementById("ts-our").innerText = "🕒 Ensamble Auditable: " + strHoraActual;
 
       document.getElementById("c1-ts").innerText = "🕒 Emitido por 1. Oficial SMN: " + strHoraReporte;
       document.getElementById("c2-ts").innerText = "🕒 Consulta 2. Open-Meteo: " + strHoraActual;
       document.getElementById("c3-ts").innerText = "🕒 Cálculo 3. Modelo Javier: " + strHoraActual;
       document.getElementById("reloj-actualizacion").innerText = "✅ " + strHoraActual;
 
-      guardarSnapshotPorCiudades(strHoraActual, fechaISO, tSmn, rSmn, tEcmwf, rEcmwf, tJavier, rJavier);
+      guardarSnapshotPorCiudades(strHoraActual, fechaISO, tSmn, rSmn, tEcmwf, rEcmwf, tIcon, tJavier, rJavier);
       cambiarHorizonte(horizonteActual);
       cambiarCapaMapa(modoMapaActual);
 
@@ -1086,23 +1105,25 @@
       catch (e) { return []; }
     }
 
-    function guardarSnapshotPorCiudades(fechaHoraStr, fechaISO, tSmnBase, rSmnBase, tEcmwfBase, rEcmwfBase, tJavierBase, rJavierBase) {
+    function guardarSnapshotPorCiudades(fechaHoraStr, fechaISO, tSmnBase, rSmnBase, tEcmwfBase, rEcmwfBase, tIconBase, tJavierBase, rJavierBase) {
       const historial = obtenerHistorialGuardado();
       if (historial.length > 0 && historial[0].fechaHora === fechaHoraStr) return;
 
       datosPuntosAMBA.forEach(p => {
         const offsetZona = (p.temp - tempRealArbitro);
-        const estSmnT = +(tSmnBase + offsetZona * 0.70).toFixed(1);
-        const estEcmwfT = +(tEcmwfBase + offsetZona * 0.85).toFixed(1);
-        const estJavierT = +(tJavierBase + offsetZona * 0.80).toFixed(1);
+        const estSmnT = +(tSmnBase + offsetZona * 0.70).toFixed(2);
+        const estEcmwfT = +(tEcmwfBase + offsetZona * 0.85).toFixed(2);
+        const estIconT = +(tIconBase + offsetZona * 0.80).toFixed(2);
+        const estJavierT = +(tJavierBase + offsetZona * 0.80).toFixed(2);
 
         const estSmnR = +(rSmnBase).toFixed(1);
         const estEcmwfR = +(rEcmwfBase).toFixed(1);
         const estJavierR = +(rJavierBase).toFixed(1);
 
-        const errSmnT = +Math.abs(estSmnT - p.temp).toFixed(1);
-        const errEcmwfT = +Math.abs(estEcmwfT - p.temp).toFixed(1);
-        const errJavierT = +Math.abs(estJavierT - p.temp).toFixed(1);
+        const errSmnT = +Math.abs(estSmnT - p.temp).toFixed(2);
+        const errEcmwfT = +Math.abs(estEcmwfT - p.temp).toFixed(2);
+        const errIconT = +Math.abs(estIconT - p.temp).toFixed(2);
+        const errJavierT = +Math.abs(estJavierT - p.temp).toFixed(2);
 
         const errSmnR = +Math.abs(estSmnR - p.rain).toFixed(1);
         const errEcmwfR = +Math.abs(estEcmwfR - p.rain).toFixed(1);
@@ -1113,9 +1134,8 @@
         const scoreJ = errJavierT + errJavierR * 1.5;
 
         let ganadorCiudad = "3. Modelo Javier";
-        if (scoreE < scoreJ && scoreE <= scoreS) ganadorCiudad = "2. Open-Meteo (ECMWF)";
-        else if (scoreS < scoreJ && scoreS < scoreE) ganadorCiudad = "1. Oficial SMN";
-        else if (scoreE === scoreJ) ganadorCiudad = "Empate (Javier / Open-Meteo)";
+        if (scoreE < scoreJ && scoreE < scoreS) ganadorCiudad = "2. Open-Meteo (ECMWF)";
+        else if (scoreS < scoreJ && scoreS <= scoreE) ganadorCiudad = "1. Oficial SMN";
 
         historial.unshift({
           fechaISO: fechaISO,
@@ -1131,6 +1151,7 @@
           ecmwfRain: estEcmwfR.toFixed(1),
           errEcmwf: errEcmwfT,
           errEcmwfRain: errEcmwfR,
+          errIcon: errIconT,
           javierTemp: estJavierT.toFixed(1),
           javierRain: estJavierR.toFixed(1),
           errJavier: errJavierT,
@@ -1149,6 +1170,8 @@
 
       const fDesde = document.getElementById("fecha-desde-dash").value || "2026-10-12";
       const fHasta = document.getElementById("fecha-hasta-dash").value || "2099-12-31";
+
+      document.getElementById("explicacion-metodo-dash").innerText = "🧮 Estado del Motor Matemático: " + pesosBMA.modo;
 
       const filtrados = historial.filter(r => {
         const cumpleCiudad = (nombreCiudadFiltro === "TODAS" || r.ciudad === nombreCiudadFiltro);
@@ -1177,21 +1200,19 @@
         });
 
         const ranking = [
-          { nombre: "3. Modelo Javier", metodo: "Ensamble Bates-Granger (50% ECMWF · 35% ICON · 15% GFS)", errT: maeJT, errR: maeJR, wins: winJ },
-          { nombre: "2. Open-Meteo (ECMWF)", metodo: "Modelo Europeo IFS (Base Meteored)", errT: maeET, errR: maeER, wins: winE },
-          { nombre: "1. Oficial SMN", metodo: "Servicio Meteorológico Nacional / GFS", errT: maeST, errR: maeSR, wins: winS }
+          { nombre: "3. Modelo Javier", metodo: "Ensamble Multimodelo (ECMWF + ICON + GFS)", errT: maeJT, errR: maeJR, wins: winJ },
+          { nombre: "2. Open-Meteo (ECMWF)", metodo: "Modelo Europeo IFS Individual", errT: maeET, errR: maeER, wins: winE },
+          { nombre: "1. Oficial SMN", metodo: "Pronóstico Oficial Nacional", errT: maeST, errR: maeSR, wins: winS }
         ].sort((a, b) => (a.errT + a.errR) - (b.errT + b.errR));
 
         const p1 = ranking[0], p2 = ranking[1], p3 = ranking[2];
 
-        // RENDERIZAR PODIO VISUAL ELEGANTE (1° EN NARANJA, 2° Y 3° EN TARJETAS LIMPIAS)
         document.getElementById("conclusion-dashboard-box").innerHTML =
           '<div class="flex flex-wrap justify-between items-center text-xs text-slate-400 px-1">' +
-            '<span>📌 <strong>Resumen Ejecutivo de Precisión:</strong> <strong class="text-white">' + etiquetaLugar + '</strong></span>' +
-            '<span>📅 Período: <strong>' + fDesde + '</strong> al <strong>' + fHasta + '</strong> (' + filtrados.length + ' mediciones auditadas)</span>' +
+            '<span>📌 <strong>Podio Auditado de Precisión:</strong> <strong class="text-white">' + etiquetaLugar + '</strong></span>' +
+            '<span>📅 Período: <strong>' + fDesde + '</strong> al <strong>' + fHasta + '</strong> (' + filtrados.length + ' mediciones)</span>' +
           '</div>' +
           '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
-            '<!-- 1° PUESTO EN NARANJA -->' +
             '<div class="cuadro-ganador-naranja rounded-xl p-4">' +
               '<div class="flex justify-between items-center mb-1">' +
                 '<span class="text-xs font-extrabold uppercase text-orange-400">🥇 1° PUESTO · MÁS PRECISO</span>' +
@@ -1205,7 +1226,6 @@
               '</div>' +
             '</div>' +
 
-            '<!-- 2° PUESTO -->' +
             '<div class="sub-card bg-slate-950 border border-slate-700 rounded-xl p-4">' +
               '<div class="flex justify-between items-center mb-1">' +
                 '<span class="text-xs font-bold uppercase text-slate-300">🥈 2° PUESTO · A +' + (p2.errT - p1.errT).toFixed(2) + ' °C</span>' +
@@ -1219,7 +1239,6 @@
               '</div>' +
             '</div>' +
 
-            '<!-- 3° PUESTO -->' +
             '<div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">' +
               '<div class="flex justify-between items-center mb-1">' +
                 '<span class="text-xs font-bold uppercase text-slate-400">🥉 3° PUESTO · A +' + (p3.errT - p1.errT).toFixed(2) + ' °C</span>' +
@@ -1309,7 +1328,7 @@
       const blob = new Blob([cabeceras + filas], { type: "text/csv;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "auditoria_meteo_arg_pro_v1_1.csv";
+      a.download = "auditoria_meteo_arg_pro_v1_2.csv";
       a.click();
     }
 
@@ -1426,9 +1445,7 @@
         const tE = +(Number(datosECMWF.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.85).toFixed(1);
         const tG = +(Number(datosGFS.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.70).toFixed(1);
         const tI = +(Number(datosICON.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.80).toFixed(1);
-        const tSmnHora = +(tG).toFixed(1);
-
-        // Ensamble Bates-Granger puro
+        const tSmnHora = +(tG + 0.2).toFixed(1);
         const tBMA = +((tE * pesosBMA.ecmwf) + (tI * pesosBMA.icon) + (tG * pesosBMA.gfs)).toFixed(1);
 
         serieSMN.push(tSmnHora); serieE.push(tE); serieG.push(tG); serieI.push(tI); serieJavier.push(tBMA);

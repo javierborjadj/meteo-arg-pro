@@ -1,7 +1,7 @@
 ﻿# 02 — Historial de Versiones y Código (Changelog)
 
-## [v1.1.0] — 2026-10-12 (Paleta Ámbar, Ganador en Naranja, Real en Verde y Ensamble Bates-Granger sin Data Leakage)
+## [v1.2.0] — 2026-10-12 (Transparencia Multimodelo, Ensamble Neutro Inicial y Desempate Exacto)
 ### Mejoras agregadas
-- **Paleta Ámbar por defecto + Código de Colores Semántico:** El cuadro de la Estación Real queda fijo en **Verde Esmeralda** (`🟢 REAL`) y el cuadro del modelo ganador en ese instante (cualquiera de los 3) se ilumina en **Naranja** (`🟠 🏆 MEJOR AHORA`).
-- **Corrección Matemática (Eliminación de Data Leakage):** Se reemplazó la corrección en tiempo real que leía el dato actual por un **Ensamble Bates-Granger de Inversa de Varianza Histórica** (`50% ECMWF + 35% ICON + 15% GFS`, reajustado solo con historial previo).
-- **Podio Visual en el Dashboard:** Se reemplazó el texto de conclusión por un tablero de 3 tarjetas de Podio (`🥇 1° Puesto en Naranja`, `🥈 2° Puesto`, `🥉 3° Puesto`).
+- **Desglose explícito en Cuadro 2 (`2. OPEN-METEO`):** Ahora muestra en vivo el valor individual de `ECMWF`, `GFS` e `ICON` para poder auditar a simple vista la cuenta del Modelo Javier.
+- **Metodología Científica de Pesos:** Durante las primeras 24 muestras recolectadas utiliza **Media de Ensamble Equiponderada (`33.3% ECMWF + 33.3% ICON + 33.3% GFS`)** sin porcentajes arbitrarios. Al superar las 24 muestras, activa los pesos dinámicos por Inversa del Error Cuadrático (`1 / MSE`) real medido.
+- **Un Único Ganador Naranja (`1° MEJOR AHORA`):** Desempata usando precisión de 2 decimales (`0.01 °C`) para evitar que dos cuadros se iluminen de naranja al mismo tiempo.
