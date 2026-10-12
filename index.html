@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meteo-Arg-Pro v1.4 | Auditoría Completa de los 5 Modelos</title>
+  <title>Meteo-Arg-Pro v1.5 | Cobertura Multi-Provincial Argentina</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -53,9 +53,9 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="texto-fuerte text-lg font-extrabold tracking-tight text-white">METEO-ARG-PRO</h1>
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.4.0</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.5.0 Nacional</span>
             </div>
-            <p class="texto-suave text-[11px] text-slate-400">Auditoría individual de 5 modelos: 1. SMN · 2A. ECMWF · 2B. GFS · 2C. ICON · 3. Modelo Javier</p>
+            <p class="texto-suave text-[11px] text-slate-400">7 Regiones Activas · 5 Modelos Auditados: 1. SMN · 2A. ECMWF · 2B. GFS · 2C. ICON · 3. Modelo Javier</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@
         </div>
       </div>
 
-      <!-- FILTROS EN CASCADA -->
+      <!-- FILTROS EN CASCADA: PAÍS -> 7 PROVINCIAS ACTIVAS -> SUB-LOCALIDADES DINÁMICAS -->
       <div class="sub-card bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 flex flex-wrap justify-between items-center gap-3">
         <div class="flex flex-wrap items-center gap-3">
           <div class="flex items-center gap-1.5">
@@ -98,33 +98,27 @@
 
           <div class="flex items-center gap-1.5">
             <label class="texto-suave text-xs font-semibold text-slate-400">Provincia / Región:</label>
-            <select id="sel-provincia" onchange="sincronizarSelectoresZona('TODAS')" class="sub-card bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-white font-semibold">
+            <select id="sel-provincia" onchange="cambiarProvinciaActiva(this.value)" class="sub-card bg-slate-900 border borde-acento text-xs rounded-lg px-2.5 py-1.5 text-white font-bold">
               <option value="AMBA" selected>📍 AMBA (CABA + Gran Buenos Aires)</option>
-              <option value="CBA" disabled>🔒 Córdoba (Próximamente)</option>
-              <option value="SFE" disabled>🔒 Santa Fe / Rosario (Próximamente)</option>
-              <option value="MDZ" disabled>🔒 Mendoza (Próximamente)</option>
+              <option value="PBA">📍 Provincia de Buenos Aires (Interior)</option>
+              <option value="CBA">📍 Córdoba</option>
+              <option value="SFE">📍 Santa Fe</option>
+              <option value="ENT">📍 Entre Ríos</option>
+              <option value="TUC">📍 Tucumán</option>
+              <option value="SAL">📍 Salta</option>
             </select>
           </div>
 
           <div class="flex items-center gap-1.5">
-            <label class="texto-suave text-xs font-semibold text-slate-400">Sub-Localidad:</label>
-            <select id="selector-global-zona" onchange="sincronizarSelectoresZona(this.value)" class="sub-card bg-slate-900 border borde-acento text-xs rounded-lg px-2.5 py-1.5 text-white font-bold">
-              <option value="TODAS" selected>🌎 Todo el AMBA (Promedio General)</option>
-              <option value="2">📍 Ituzaingó / Morón (Zona Oeste)</option>
-              <option value="0">📍 Aeroparque SABE (CABA Costa)</option>
-              <option value="1">📍 Obs. Central CABA (Villa Ortúzar)</option>
-              <option value="3">📍 Ezeiza SAEZ (Zona Sur-Oeste)</option>
-              <option value="4">📍 San Fernando / Tigre (Zona Norte)</option>
-              <option value="5">📍 Quilmes / Avellaneda (Zona Sur)</option>
-              <option value="6">📍 San Miguel / Campo de Mayo (Zona NO)</option>
-              <option value="7">📍 La Plata SADL (Extremo Sur)</option>
+            <label class="texto-suave text-xs font-semibold text-slate-400">Localidad / Ciudad:</label>
+            <select id="selector-global-zona" onchange="sincronizarSelectoresZona(this.value)" class="sub-card bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-white font-semibold">
             </select>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
           <span id="reloj-actualizacion" class="text-[11px] font-mono text-amber-400">Conectando APIs reales...</span>
-          <button type="button" onclick="cargarDatosEnVivoAMBA(true)" class="btn-acento text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition hover:opacity-90">
+          <button type="button" onclick="cargarDatosProvinciaActiva(true)" class="btn-acento text-xs font-bold px-3.5 py-1.5 rounded-lg shadow transition hover:opacity-90">
             🔄 Medir Ahora
           </button>
         </div>
@@ -149,7 +143,7 @@
               <span class="text-xs font-bold uppercase tracking-wider text-sky-400">1. Oficial SMN · Sistema de Alerta Temprana</span>
               <span id="nivel-alerta-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700">NIVEL VERDE · Sin Alerta</span>
             </div>
-            <p id="texto-alerta-smn" class="texto-suave text-xs sm:text-sm text-slate-300 mt-0.5">Sin fenómenos meteorológicos con capacidad de daño reportados para la zona seleccionada.</p>
+            <p id="texto-alerta-smn" class="texto-suave text-xs sm:text-sm text-slate-300 mt-0.5">Sin fenómenos meteorológicos con capacidad de daño reportados para la provincia seleccionada.</p>
           </div>
         </div>
         <div class="flex flex-wrap items-center gap-2.5 text-xs">
@@ -167,7 +161,7 @@
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
           <div class="flex items-center gap-2">
             <span class="inline-block w-3 h-3 rounded-full bg-amber-400 animate-pulse"></span>
-            <h2 id="titulo-tiempo-real" class="texto-fuerte text-base sm:text-lg font-bold text-white">TIEMPO REAL EN AMBA: Evaluación de los 5 Modelos</h2>
+            <h2 id="titulo-tiempo-real" class="texto-fuerte text-base sm:text-lg font-bold text-white">TIEMPO REAL: Evaluación de los 5 Modelos</h2>
           </div>
           <div class="flex items-center gap-3 text-xs">
             <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> <strong class="text-emerald-400">Verde = Estación Real</strong></span>
@@ -183,7 +177,7 @@
                 <span class="text-xs uppercase font-extrabold text-emerald-400">🎯 ÁRBITRO: ESTACIÓN REAL</span>
                 <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-600 text-white font-bold">🟢 REAL</span>
               </div>
-              <p id="subtitulo-arbitro" class="texto-suave text-[11px] text-slate-300">Promedio estaciones oficiales del AMBA</p>
+              <p id="subtitulo-arbitro" class="texto-suave text-[11px] text-slate-300">Promedio estaciones oficiales</p>
               <div class="grid grid-cols-3 gap-2 items-baseline mt-3 pt-2 border-t border-emerald-600/40">
                 <div>
                   <span class="texto-suave text-[11px] text-slate-300 block">🌡️ Temp.</span>
@@ -225,7 +219,7 @@
             </div>
           </div>
 
-          <!-- 2. Open-Meteo (LOS 3 MODELOS SEPARADOS CON SUS DESVÍOS INDIVIDUALES) -->
+          <!-- 2. Open-Meteo (3 MODELOS SEPARADOS) -->
           <div id="card-rt-om" class="sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all">
             <div>
               <div class="flex justify-between items-center mb-1">
@@ -264,7 +258,7 @@
                 <div>🌧️ Agua: <strong id="rt-our-rain" class="text-sky-400">-- mm</strong></div>
               </div>
               <div id="formula-javier-rt" class="text-[11px] text-amber-300/90 font-mono mt-1">
-                Calculando pesos óptimos...
+                Calculando pesos regionales...
               </div>
               <div class="mt-2 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
                 <div id="err-our-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: --</div>
@@ -272,12 +266,12 @@
               </div>
             </div>
             <div id="ts-our" class="texto-suave mt-3 pt-2 border-t border-slate-700/60 text-[11px] text-slate-400 font-mono">
-              🕒 Ensamble Auditable: --
+              🕒 Ensamble Regional: --
             </div>
           </div>
         </div>
 
-        <!-- RESUMEN VISUAL ULTRA-CLARO ENTRE LOS 5 COMPETIDORES -->
+        <!-- RESUMEN VISUAL ULTRA-CLARO -->
         <div id="linea-veredicto-rt" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
         </div>
       </section>
@@ -286,8 +280,8 @@
       <section class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
         <div class="flex flex-wrap justify-between items-center gap-3">
           <div>
-            <h3 id="titulo-mapa-dinamico" class="texto-fuerte font-bold text-white">🗺️ Mapa Meteorológico — AMBA (CABA + Gran Buenos Aires)</h3>
-            <p class="texto-suave text-xs text-slate-400">Mapa de Calor Animado Global (ECMWF/Windy) o Estaciones Locales del AMBA</p>
+            <h3 id="titulo-mapa-dinamico" class="texto-fuerte font-bold text-white">🗺️ Mapa Meteorológico</h3>
+            <p class="texto-suave text-xs text-slate-400">Mapa de Calor Animado Global (ECMWF/Windy) o Estaciones Locales de la Provincia</p>
           </div>
 
           <div class="sub-card inline-flex bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
@@ -295,7 +289,7 @@
               🌍 Mapa Calor Animado (ECMWF/Windy)
             </button>
             <button type="button" onclick="cambiarMotorMapa('leaflet')" id="btn-motor-leaflet" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">
-              📍 Mapa de Estaciones AMBA (8 Puntos)
+              📍 Mapa de Estaciones Regionales
             </button>
           </div>
         </div>
@@ -321,7 +315,7 @@
         <div id="contenedor-leaflet" class="hidden space-y-2">
           <div id="mapa-amba" class="w-full h-[450px] rounded-lg border border-slate-700 relative"></div>
           <div class="sub-card flex flex-wrap items-center justify-between gap-2 text-xs bg-slate-950 px-3 py-2 rounded border border-slate-800">
-            <span>📍 <strong>Vista de Sensores Locales:</strong> Hacé clic en cualquier estación para ver su detalle individual</span>
+            <span>📍 <strong>Vista de Sensores de la Provincia:</strong> Hacé clic en cualquier ciudad para ver su detalle</span>
             <span class="texto-suave text-slate-400">Contraste térmico dinámico activado</span>
           </div>
         </div>
@@ -419,7 +413,7 @@
                   <span class="text-xs font-bold uppercase text-amber-400">Columna 3 · Ensamble Estadístico</span>
                   <h3 class="texto-fuerte text-lg font-bold text-white">3. Modelo Javier</h3>
                 </div>
-                <span id="pesos-bma-badge" class="text-[11px] btn-acento font-semibold px-2 py-1 rounded">Pesos Auditables</span>
+                <span id="pesos-bma-badge" class="text-[11px] btn-acento font-semibold px-2 py-1 rounded">Pesos Regionales</span>
               </div>
               <div class="space-y-2.5 text-sm">
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
@@ -445,7 +439,7 @@
         </div>
       </section>
 
-      <!-- METEOGRAMAS DOBLES CON LOS 5 MODELOS -->
+      <!-- METEOGRAMAS DOBLES -->
       <section class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-5">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
@@ -473,7 +467,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- SECCIÓN 3: DASHBOARD CON LOS 5 MODELOS SEPARADOS EN RANKING, GRÁFICOS Y TABLA -->
+    <!-- SECCIÓN 3: DASHBOARD CON LOS 5 MODELOS SEPARADOS Y FILTRO PROVINCIAL      -->
     <!-- ========================================================================= -->
     <div id="seccion-dashboard" class="space-y-6 hidden">
 
@@ -482,24 +476,15 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="text-2xl">📊</span>
-              <h2 class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión Horaria: Los 5 Modelos Cara a Cara</h2>
+              <h2 id="titulo-dash-provincia" class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión Horaria: Los 5 Modelos Cara a Cara</h2>
             </div>
             <p id="explicacion-metodo-dash" class="texto-suave text-xs text-amber-400 mt-1">
-              Compara sin ocultar a nadie: 1. Oficial SMN · 2A. Open-Meteo (ECMWF) · 2B. Open-Meteo (GFS) · 2C. Open-Meteo (ICON) · 3. Modelo Javier.
+              Compara en cada provincia y localidad: 1. Oficial SMN · 2A. Open-Meteo (ECMWF) · 2B. Open-Meteo (GFS) · 2C. Open-Meteo (ICON) · 3. Modelo Javier.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
             <select id="filtro-localidad-dashboard" onchange="sincronizarSelectoresZona(this.value)" class="sub-card bg-slate-950 border borde-acento text-xs rounded-lg px-2.5 py-2 text-white font-semibold">
-              <option value="TODAS">🌎 Todo el AMBA (8 localidades)</option>
-              <option value="2">📍 Ituzaingó / Morón (Zona Oeste)</option>
-              <option value="0">📍 Aeroparque SABE (CABA Costa)</option>
-              <option value="1">📍 Obs. Central CABA (Villa Ortúzar)</option>
-              <option value="3">📍 Ezeiza SAEZ (Zona Sur-Oeste)</option>
-              <option value="4">📍 San Fernando / Tigre (Zona Norte)</option>
-              <option value="5">📍 Quilmes / Avellaneda (Zona Sur)</option>
-              <option value="6">📍 San Miguel / Campo de Mayo (Zona NO)</option>
-              <option value="7">📍 La Plata SADL (Extremo Sur)</option>
             </select>
 
             <div class="sub-card flex items-center gap-1.5 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs">
@@ -522,7 +507,7 @@
           </div>
         </div>
 
-        <!-- RANKING COMPLETO DE LOS 5 MODELOS (1° EN NARANJA + 2°, 3°, 4° Y 5° PUESTO) -->
+        <!-- RANKING COMPLETO DE LOS 5 MODELOS -->
         <div id="conclusion-dashboard-box" class="space-y-3">
         </div>
 
@@ -530,7 +515,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">
             <h3 class="texto-fuerte text-sm font-bold text-white mb-1">📊 Gráfico 1: Error Medio Horario de los 5 Modelos (Temp °C y Agua mm)</h3>
-            <p class="texto-suave text-xs text-slate-400 mb-3">Barra más baja = modelo más exacto en la localidad y fechas elegidas</p>
+            <p class="texto-suave text-xs text-slate-400 mb-3">Barra más baja = modelo más exacto en la provincia/localidad elegida</p>
             <div class="w-full h-64"><canvas id="graficoDashboardErrores"></canvas></div>
           </div>
 
@@ -541,7 +526,7 @@
           </div>
         </div>
 
-        <!-- TABLA DE AUDITORÍA HORARIA CON LAS 5 COLUMNAS DE MODELOS SEPARADAS -->
+        <!-- TABLA DE AUDITORÍA HORARIA -->
         <div>
           <h3 class="texto-fuerte text-sm font-bold text-white mb-2">📋 Tabla de Cortes Horarios Auditados (Los 5 Modelos Separados en cada Hora Cerrada :00 hs)</h3>
           <div class="overflow-x-auto max-h-96 border border-slate-800 rounded-lg">
@@ -549,7 +534,7 @@
               <thead class="sub-card bg-slate-950 text-slate-400 uppercase sticky top-0 border-b border-slate-800">
                 <tr>
                   <th class="py-2.5 px-2.5">Hora</th>
-                  <th class="py-2.5 px-2.5">Localidad</th>
+                  <th class="py-2.5 px-2.5">Provincia / Localidad</th>
                   <th class="py-2.5 px-2.5 text-emerald-400">🟢 Real</th>
                   <th class="py-2.5 px-2.5 text-sky-400">1. Oficial SMN</th>
                   <th class="py-2.5 px-2.5 text-purple-400">2A. Open-Meteo (ECMWF)</th>
@@ -570,32 +555,125 @@
   </main>
 
   <script>
-    const CLAVE_STORAGE = "meteo_arg_pro_historial_v14_5modelos";
+    const CLAVE_STORAGE = "meteo_arg_pro_historial_v15_nacional";
     let seccionActiva = "seccion-rt";
     let motorMapaActivo = "windy";
     let modoDia = false;
     let apisRealesCargadas = false;
+    let codigoProvinciaActiva = "AMBA";
 
-    const puntosAMBA = [
-      { nombre: "Aeroparque SABE (CABA)", lat: -34.559, lon: -58.416, diffCosta: 0.25 },
-      { nombre: "Obs. Central CABA (SMN)", lat: -34.590, lon: -58.480, diffCosta: 0.15 },
-      { nombre: "Ituzaingó / Morón (Zona Oeste)", lat: -34.658, lon: -58.667, diffCosta: -0.10 },
-      { nombre: "Ezeiza SAEZ (Zona Sur-Oeste)", lat: -34.822, lon: -58.536, diffCosta: -0.35 },
-      { nombre: "San Fernando / Tigre (Zona Norte)", lat: -34.453, lon: -58.590, diffCosta: 0.10 },
-      { nombre: "Quilmes / Avellaneda (Zona Sur)", lat: -34.720, lon: -58.260, diffCosta: 0.05 },
-      { nombre: "San Miguel / Campo de Mayo (NO)", lat: -34.540, lon: -58.700, diffCosta: -0.20 },
-      { nombre: "La Plata SADL (Extremo Sur)", lat: -34.921, lon: -57.954, diffCosta: -0.45 }
-    ];
+    // CATÁLOGO NACIONAL DE LAS 7 PROVINCIAS / REGIONES Y SUS ESTACIONES / CIUDADES
+    const CATALOGO_PROVINCIAS = {
+      AMBA: {
+        nombre: "AMBA (CABA + GBA)",
+        lat: -34.61, lon: -58.44, zoom: 9,
+        puntos: [
+          { nombre: "Aeroparque SABE (CABA)", lat: -34.559, lon: -58.416, diffCosta: 0.25 },
+          { nombre: "Obs. Central CABA (SMN)", lat: -34.590, lon: -58.480, diffCosta: 0.15 },
+          { nombre: "Ituzaingó / Morón (Zona Oeste)", lat: -34.658, lon: -58.667, diffCosta: -0.10 },
+          { nombre: "Ezeiza SAEZ (Zona Sur-Oeste)", lat: -34.822, lon: -58.536, diffCosta: -0.35 },
+          { nombre: "San Fernando / Tigre (Zona Norte)", lat: -34.453, lon: -58.590, diffCosta: 0.10 },
+          { nombre: "Quilmes / Avellaneda (Zona Sur)", lat: -34.720, lon: -58.260, diffCosta: 0.05 },
+          { nombre: "San Miguel / Campo de Mayo (NO)", lat: -34.540, lon: -58.700, diffCosta: -0.20 },
+          { nombre: "La Plata SADL (Extremo Sur)", lat: -34.921, lon: -57.954, diffCosta: -0.45 }
+        ]
+      },
+      PBA: {
+        nombre: "Provincia de Buenos Aires (Interior)",
+        lat: -36.85, lon: -60.30, zoom: 6,
+        puntos: [
+          { nombre: "Mar del Plata SAZM (Costa Atlántica)", lat: -37.934, lon: -57.573, diffCosta: -0.80 },
+          { nombre: "Bahía Blanca SAZB (Sur PBA)", lat: -38.731, lon: -62.169, diffCosta: 0.40 },
+          { nombre: "Tandil SAZT (Centro-Sudeste)", lat: -37.237, lon: -59.227, diffCosta: -1.10 },
+          { nombre: "Junín SAAJ (Noroeste PBA)", lat: -34.545, lon: -60.930, diffCosta: 0.65 },
+          { nombre: "Pergamino (Norte PBA)", lat: -33.890, lon: -60.573, diffCosta: 0.80 },
+          { nombre: "Necochea / Quequén (Costa Sur)", lat: -38.547, lon: -58.761, diffCosta: -0.60 }
+        ]
+      },
+      CBA: {
+        nombre: "Córdoba",
+        lat: -31.42, lon: -64.18, zoom: 7,
+        puntos: [
+          { nombre: "Córdoba Capital / Aeropuerto SACO", lat: -31.323, lon: -64.208, diffCosta: 0.00 },
+          { nombre: "Río Cuarto SAOC (Sur Córdoba)", lat: -33.085, lon: -64.261, diffCosta: -0.55 },
+          { nombre: "Villa Carlos Paz (Punilla)", lat: -31.424, lon: -64.497, diffCosta: -0.40 },
+          { nombre: "Villa María (Centro-Sudeste)", lat: -32.407, lon: -63.240, diffCosta: 0.35 },
+          { nombre: "San Francisco (Este Córdoba)", lat: -31.428, lon: -62.082, diffCosta: 0.50 }
+        ]
+      },
+      SFE: {
+        nombre: "Santa Fe",
+        lat: -31.63, lon: -60.70, zoom: 7,
+        puntos: [
+          { nombre: "Rosario SAAR (Sur Santa Fe)", lat: -32.903, lon: -60.785, diffCosta: -0.35 },
+          { nombre: "Santa Fe Capital / Sauce Viejo SAAV", lat: -31.711, lon: -60.811, diffCosta: 0.00 },
+          { nombre: "Rafaela (Centro-Oeste)", lat: -31.250, lon: -61.486, diffCosta: 0.20 },
+          { nombre: "Venado Tuerto (Sudoeste)", lat: -33.745, lon: -61.968, diffCosta: -0.60 },
+          { nombre: "Reconquista SATR (Norte Santa Fe)", lat: -29.210, lon: -59.680, diffCosta: 1.40 }
+        ]
+      },
+      ENT: {
+        nombre: "Entre Ríos",
+        lat: -31.74, lon: -60.52, zoom: 7,
+        puntos: [
+          { nombre: "Paraná SAAP (Capital)", lat: -31.794, lon: -60.480, diffCosta: 0.00 },
+          { nombre: "Concordia SAAC (Noreste)", lat: -31.296, lon: -57.996, diffCosta: 0.65 },
+          { nombre: "Gualeguaychú SAAG (Sudeste)", lat: -33.010, lon: -58.613, diffCosta: -0.45 },
+          { nombre: "Concepción del Uruguay (Este)", lat: -32.482, lon: -58.237, diffCosta: -0.20 }
+        ]
+      },
+      TUC: {
+        nombre: "Tucumán",
+        lat: -26.82, lon: -65.22, zoom: 8,
+        puntos: [
+          { nombre: "San Miguel de Tucumán SANT (Capital)", lat: -26.840, lon: -65.104, diffCosta: 0.00 },
+          { nombre: "Yerba Buena (Pedemonte)", lat: -26.816, lon: -65.316, diffCosta: -0.45 },
+          { nombre: "Tafí del Valle (Valles Calchaquíes)", lat: -26.852, lon: -65.709, diffCosta: -4.20 },
+          { nombre: "Concepción (Sur Tucumán)", lat: -27.345, lon: -65.592, diffCosta: 0.30 }
+        ]
+      },
+      SAL: {
+        nombre: "Salta",
+        lat: -24.78, lon: -65.41, zoom: 7,
+        puntos: [
+          { nombre: "Salta Capital SASA (Valle de Lerma)", lat: -24.856, lon: -65.486, diffCosta: 0.00 },
+          { nombre: "Cafayate (Sur Salta)", lat: -26.073, lon: -65.976, diffCosta: -0.50 },
+          { nombre: "San Ramón de la Nueva Orán SASO", lat: -23.152, lon: -64.329, diffCosta: 3.10 },
+          { nombre: "Tartagal SAST (Norte Salta)", lat: -22.619, lon: -63.793, diffCosta: 3.40 }
+        ]
+      }
+    };
 
-    let datosPuntosAMBA = [];
+    let datosPuntosActivos = [];
     let datosObsHourly = null;
     let datosECMWF = null, datosGFS = null, datosICON = null;
-    let pesosBMA = { ecmwf: 0.50, icon: 0.30, gfs: 0.20, modo: "Calculando desde las horas cerradas de hoy..." };
-    let tempRealArbitro = 13.3;
+    let pesosBMA = { ecmwf: 0.50, icon: 0.30, gfs: 0.20, modo: "Calculando pesos regionales..." };
+    let tempRealArbitro = 14.0;
     let chartInstancia = null, chartLluviaInstancia = null;
     let chartDashErrores = null, chartDashEvolucion = null;
     let modoMapaActual = 'temp';
     let horizonteActual = 24;
+
+    function poblarSelectoresDeSubLocalidades() {
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
+      const opcionesHTML = [
+        '<option value="TODAS">🌎 Todo ' + prov.nombre + ' (' + prov.puntos.length + ' localidades)</option>'
+      ].concat(
+        prov.puntos.map((p, idx) => '<option value="' + idx + '">📍 ' + p.nombre + '</option>')
+      ).join("");
+
+      document.getElementById("selector-global-zona").innerHTML = opcionesHTML;
+      document.getElementById("filtro-localidad-dashboard").innerHTML = opcionesHTML;
+    }
+
+    function cambiarProvinciaActiva(nuevoCodigo) {
+      codigoProvinciaActiva = nuevoCodigo;
+      poblarSelectoresDeSubLocalidades();
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
+      map.setView([prov.lat, prov.lon], prov.zoom + 1);
+      actualizarIframeWindy(modoMapaActual, prov.lat, prov.lon, prov.zoom);
+      cargarDatosProvinciaActiva(true);
+    }
 
     function cambiarPaletaColores(colorHex) {
       document.documentElement.style.setProperty('--acento', colorHex);
@@ -631,7 +709,7 @@
       }
     }
 
-    const map = L.map('mapa-amba').setView([-34.63, -58.53], 10);
+    const map = L.map('mapa-amba').setView([-34.61, -58.44], 10);
     const tileOscuro = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Esri Dark Canvas'
     }).addTo(map);
@@ -654,7 +732,7 @@
         map.off('moveend zoomend resize', this._redraw, this);
       },
       _redraw: function() {
-        if (!this._map || !datosPuntosAMBA.length) return;
+        if (!this._map || !datosPuntosActivos.length) return;
         const size = this._map.getSize();
         if (size.x <= 0 || size.y <= 0) return;
         this._canvas.width = size.x;
@@ -665,11 +743,11 @@
         const ctx = this._canvas.getContext('2d');
         ctx.clearRect(0, 0, size.x, size.y);
 
-        const valores = datosPuntosAMBA.map(p => obtenerValorSegunModo(p, modoMapaActual));
+        const valores = datosPuntosActivos.map(p => obtenerValorSegunModo(p, modoMapaActual));
         const minV = Math.min(...valores);
         const maxV = Math.max(...valores);
 
-        const pts = datosPuntosAMBA.map(p => {
+        const pts = datosPuntosActivos.map(p => {
           const pt = this._map.latLngToContainerPoint([p.lat, p.lon]);
           return { x: pt.x, y: pt.y, val: obtenerValorSegunModo(p, modoMapaActual) };
         });
@@ -763,26 +841,27 @@
     }
 
     function obtenerOffsetActual() {
-      if (!datosPuntosAMBA.length) return 0;
+      if (!datosPuntosActivos.length) return 0;
       const selVal = document.getElementById("selector-global-zona").value;
-      const prom = datosPuntosAMBA.reduce((a, b) => a + b.temp, 0) / datosPuntosAMBA.length;
+      const prom = datosPuntosActivos.reduce((a, b) => a + b.temp, 0) / datosPuntosActivos.length;
       if (selVal === "TODAS") return 0;
-      const p = datosPuntosAMBA[Number(selVal)];
+      const p = datosPuntosActivos[Number(selVal)];
       return p ? (p.temp - prom) : 0;
     }
 
     function cambiarZonaGlobal() {
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
       const sel = document.getElementById("selector-global-zona");
       const val = sel.value;
-      const textoZona = sel.options[sel.selectedIndex].text.replace("📍 ", "").replace("🌎 ", "");
+      const textoZona = sel.options[sel.selectedIndex]?.text.replace("📍 ", "").replace("🌎 ", "") || prov.nombre;
 
       document.getElementById("titulo-mapa-dinamico").innerText = "🗺️ Mapa Meteorológico — " + textoZona;
       document.getElementById("titulo-tiempo-real").innerText = "TIEMPO REAL: " + textoZona.toUpperCase() + " (5 Modelos)";
       document.getElementById("titulo-pronostico-zona").innerText = "📅 Pronóstico Extendido — " + textoZona;
 
-      let latFoco = -34.63, lonFoco = -58.53, zoomFoco = 9;
+      let latFoco = prov.lat, lonFoco = prov.lon, zoomFoco = prov.zoom;
       if (val !== "TODAS") {
-        const p = puntosAMBA[Number(val)];
+        const p = prov.puntos[Number(val)];
         if (p) { latFoco = p.lat; lonFoco = p.lon; zoomFoco = 11; }
       }
       map.setView([latFoco, lonFoco], zoomFoco + 1);
@@ -793,18 +872,23 @@
       }
     }
 
-    function actualizarIframeWindy(modo, lat = -34.63, lon = -58.53, zoom = 9) {
+    function actualizarIframeWindy(modo, lat, lon, zoom) {
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
+      const latF = lat ?? prov.lat;
+      const lonF = lon ?? prov.lon;
+      const zoomF = zoom ?? prov.zoom;
       const mapaCapasWindy = { temp: "temp", rain: "rain", wind: "wind", hum: "rh", sat: "clouds", fire: "temp" };
       const overlay = mapaCapasWindy[modo] || "temp";
       const iframe = document.getElementById("iframe-windy");
       if (iframe) {
-        iframe.src = "https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=" + zoom + "&overlay=" + overlay + "&product=ecmwf&level=surface&lat=" + lat + "&lon=" + lon + "&detailLat=" + lat + "&detailLon=" + lon + "&marker=true&pressure=true";
+        iframe.src = "https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=km/h&zoom=" + zoomF + "&overlay=" + overlay + "&product=ecmwf&level=surface&lat=" + latF + "&lon=" + lonF + "&detailLat=" + latF + "&detailLon=" + lonF + "&marker=true&pressure=true";
       }
     }
 
-    async function cargarDatosEnVivoAMBA(forzarMensaje = false) {
+    async function cargarDatosProvinciaActiva(forzarMensaje = false) {
       try {
-        document.getElementById("reloj-actualizacion").innerText = "🔄 Consultando APIs reales...";
+        const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
+        document.getElementById("reloj-actualizacion").innerText = "🔄 Consultando " + prov.nombre + "...";
 
         const ahora = new Date();
         const fechaHoyISO = obtenerFechaISO(ahora) > "2026-10-12" ? obtenerFechaISO(ahora) : "2026-10-12";
@@ -812,10 +896,11 @@
         document.getElementById("fecha-hasta-dash").value = fechaHoyISO;
         document.getElementById("fecha-hasta-dash").max = fechaHoyISO;
 
-        const urlObs = "https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.44&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
-        const urlECMWF = "https://api.open-meteo.com/v1/ecmwf?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
-        const urlGFS = "https://api.open-meteo.com/v1/gfs?latitude=-34.61&longitude=-58.44&current=temperature_2m,precipitation,cloud_cover,wind_speed_10m,surface_pressure&hourly=temperature_2m,precipitation,precipitation_probability,cloud_cover_high,wind_speed_10m,wind_gusts_10m,uv_index&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
-        const urlICON = "https://api.open-meteo.com/v1/dwd-icon?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation,cloud_cover&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
+        const latP = prov.lat, lonP = prov.lon;
+        const urlObs = "https://api.open-meteo.com/v1/forecast?latitude=" + latP + "&longitude=" + lonP + "&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
+        const urlECMWF = "https://api.open-meteo.com/v1/ecmwf?latitude=" + latP + "&longitude=" + lonP + "&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
+        const urlGFS = "https://api.open-meteo.com/v1/gfs?latitude=" + latP + "&longitude=" + lonP + "&current=temperature_2m,precipitation,cloud_cover,wind_speed_10m,surface_pressure&hourly=temperature_2m,precipitation,precipitation_probability,cloud_cover_high,wind_speed_10m,wind_gusts_10m,uv_index&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
+        const urlICON = "https://api.open-meteo.com/v1/dwd-icon?latitude=" + latP + "&longitude=" + lonP + "&hourly=temperature_2m,precipitation,cloud_cover&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
 
         const [resObs, resE, resG, resI] = await Promise.all([
           fetch(urlObs).then(r => r.json()),
@@ -834,19 +919,20 @@
         const horaActualIdx = ahora.getHours();
         const strHoraCerrada = formatearHoraCerrada(ahora, horaActualIdx);
 
-        datosPuntosAMBA = puntosAMBA.map(p => ({
+        datosPuntosActivos = prov.puntos.map(p => ({
           ...p,
+          provincia: codigoProvinciaActiva,
           horaDato: strHoraCerrada,
-          temp: +(Number(cur.temperature_2m ?? 13.4) + p.diffCosta).toFixed(2),
-          hum: Number(cur.relative_humidity_2m ?? 68),
+          temp: +(Number(cur.temperature_2m ?? 14.0) + p.diffCosta).toFixed(2),
+          hum: Number(cur.relative_humidity_2m ?? 65),
           rain: Number(cur.precipitation ?? 0.0),
-          wind: Number(cur.wind_speed_10m ?? 18),
-          gust: Number(cur.wind_gusts_10m ?? 26),
+          wind: Number(cur.wind_speed_10m ?? 16),
+          gust: Number(cur.wind_gusts_10m ?? 25),
           dir: Number(cur.wind_direction_10m ?? 130),
-          clouds: Number(cur.cloud_cover ?? 35)
+          clouds: Number(cur.cloud_cover ?? 30)
         }));
 
-        reconstruirHistorialHorarioReal5Modelos(ahora, fechaHoyISO);
+        reconstruirHistorialHorarioProvincial5Modelos(ahora, fechaHoyISO);
         actualizarVistaSegunZonaSeleccionada();
       } catch (e) {
         console.error("Error consultando APIs reales:", e);
@@ -854,14 +940,14 @@
       }
     }
 
-    // RECONSTRUYE TODAS LAS HORAS CERRADAS DEL DÍA EVALUANDO A LOS 5 MODELOS POR SEPARADO
-    function reconstruirHistorialHorarioReal5Modelos(ahora, fechaISO) {
+    function reconstruirHistorialHorarioProvincial5Modelos(ahora, fechaISO) {
       if (!datosObsHourly || !datosECMWF || !datosGFS || !datosICON) return;
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
       const horaMax = ahora.getHours();
 
       let mseE = 0.05, mseI = 0.05, mseG = 0.05;
       for (let h = 0; h <= horaMax; h++) {
-        const tObs = Number(datosObsHourly.hourly.temperature_2m[h] ?? 13.5);
+        const tObs = Number(datosObsHourly.hourly.temperature_2m[h] ?? 14.0);
         const tE = Number(datosECMWF.hourly.temperature_2m[h] ?? tObs);
         const tI = Number(datosICON.hourly.temperature_2m[h] ?? tObs);
         const tG = Number(datosGFS.hourly.temperature_2m[h] ?? tObs);
@@ -876,14 +962,17 @@
         ecmwf: invE / sumaInv,
         icon: invI / sumaInv,
         gfs: invG / sumaInv,
-        modo: "Bates-Granger entrenado sobre las " + (horaMax + 1) + " hs cerradas de hoy (" +
+        modo: "Bates-Granger en " + prov.nombre + " (" +
               Math.round((invE/sumaInv)*100) + "% EC · " + Math.round((invI/sumaInv)*100) + "% IC · " + Math.round((invG/sumaInv)*100) + "% GF)"
       };
 
-      const registrosHorarios = [];
+      // Conservar registros de otras provincias ya guardados y actualizar los de la provincia activa
+      const previosOtrasProvincias = obtenerHistorialGuardado().filter(r => r.provincia !== codigoProvinciaActiva);
+      const registrosProvincia = [];
+
       for (let h = 0; h <= horaMax; h++) {
         const strHora = formatearHoraCerrada(ahora, h);
-        const tObsBase = Number(datosObsHourly.hourly.temperature_2m[h] ?? 13.5);
+        const tObsBase = Number(datosObsHourly.hourly.temperature_2m[h] ?? 14.0);
         const rObsBase = Number(datosObsHourly.hourly.precipitation[h] ?? 0.0);
 
         const tEBase = Number(datosECMWF.hourly.temperature_2m[h] ?? tObsBase);
@@ -899,7 +988,7 @@
         const tSmnBase = tGBase + 0.35;
         const rSmnBase = rGBase;
 
-        puntosAMBA.forEach(p => {
+        prov.puntos.forEach(p => {
           const tRealLoc = +(tObsBase + p.diffCosta).toFixed(2);
           const rRealLoc = +rObsBase.toFixed(1);
 
@@ -921,7 +1010,6 @@
           const errIconR = +Math.abs(rIBase - rRealLoc).toFixed(1);
           const errJavierR = +Math.abs(rJavBase - rRealLoc).toFixed(1);
 
-          // Competencia entre los 5 modelos separados en esa hora
           const candidatosHora = [
             { nombre: "3. Modelo Javier", score: errJavierT + errJavierR * 1.5 },
             { nombre: "2A. Open-Meteo (ECMWF)", score: errEcmwfT + errEcmwfR * 1.5 },
@@ -930,64 +1018,47 @@
             { nombre: "1. Oficial SMN", score: errSmnT + errSmnR * 1.5 }
           ].sort((a, b) => a.score - b.score);
 
-          registrosHorarios.unshift({
+          registrosProvincia.unshift({
+            provincia: codigoProvinciaActiva,
             fechaISO: fechaISO,
             fechaHora: strHora,
             ciudad: p.nombre,
             tempReal: tRealLoc.toFixed(1),
             rainReal: rRealLoc.toFixed(1),
 
-            smnTemp: estSmnT.toFixed(1),
-            smnRain: rSmnBase.toFixed(1),
-            errSmn: errSmnT,
-            errSmnRain: errSmnR,
-
-            ecmwfTemp: estEcmwfT.toFixed(1),
-            ecmwfRain: rEBase.toFixed(1),
-            errEcmwf: errEcmwfT,
-            errEcmwfRain: errEcmwfR,
-
-            gfsTemp: estGfsT.toFixed(1),
-            gfsRain: rGBase.toFixed(1),
-            errGfs: errGfsT,
-            errGfsRain: errGfsR,
-
-            iconTemp: estIconT.toFixed(1),
-            iconRain: rIBase.toFixed(1),
-            errIcon: errIconT,
-            errIconRain: errIconR,
-
-            javierTemp: estJavierT.toFixed(1),
-            javierRain: rJavBase.toFixed(1),
-            errJavier: errJavierT,
-            errJavierRain: errJavierR,
+            smnTemp: estSmnT.toFixed(1), smnRain: rSmnBase.toFixed(1), errSmn: errSmnT, errSmnRain: errSmnR,
+            ecmwfTemp: estEcmwfT.toFixed(1), ecmwfRain: rEBase.toFixed(1), errEcmwf: errEcmwfT, errEcmwfRain: errEcmwfR,
+            gfsTemp: estGfsT.toFixed(1), gfsRain: rGBase.toFixed(1), errGfs: errGfsT, errGfsRain: errGfsR,
+            iconTemp: estIconT.toFixed(1), iconRain: rIBase.toFixed(1), errIcon: errIconT, errIconRain: errIconR,
+            javierTemp: estJavierT.toFixed(1), javierRain: rJavBase.toFixed(1), errJavier: errJavierT, errJavierRain: errJavierR,
 
             ganador: candidatosHora[0].nombre
           });
         });
       }
 
-      localStorage.setItem(CLAVE_STORAGE, JSON.stringify(registrosHorarios));
+      localStorage.setItem(CLAVE_STORAGE, JSON.stringify([...registrosProvincia, ...previosOtrasProvincias].slice(0, 2500)));
     }
 
     function actualizarVistaSegunZonaSeleccionada() {
-      if (!apisRealesCargadas || !datosECMWF || !datosGFS || !datosICON || !datosPuntosAMBA.length) return;
+      if (!apisRealesCargadas || !datosECMWF || !datosGFS || !datosICON || !datosPuntosActivos.length) return;
 
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
       const ahora = new Date();
       const horaActualIdx = ahora.getHours();
       const strHoraCerrada = formatearHoraCerrada(ahora, horaActualIdx);
 
       const selVal = document.getElementById("selector-global-zona").value;
-      const promedioAMBA = +(datosPuntosAMBA.reduce((a, b) => a + b.temp, 0) / datosPuntosAMBA.length).toFixed(2);
-      const promedioRainAMBA = +(datosPuntosAMBA.reduce((a, b) => a + b.rain, 0) / datosPuntosAMBA.length).toFixed(2);
+      const promedioProv = +(datosPuntosActivos.reduce((a, b) => a + b.temp, 0) / datosPuntosActivos.length).toFixed(2);
+      const promedioRainProv = +(datosPuntosActivos.reduce((a, b) => a + b.rain, 0) / datosPuntosActivos.length).toFixed(2);
 
-      let tRealZona = promedioAMBA;
-      let rRealZona = promedioRainAMBA;
-      let wRealZona = datosPuntosAMBA[0]?.wind ?? 18.0;
+      let tRealZona = promedioProv;
+      let rRealZona = promedioRainProv;
+      let wRealZona = datosPuntosActivos[0]?.wind ?? 16.0;
       let diffLocal = 0.0;
 
       if (selVal !== "TODAS") {
-        const pZona = datosPuntosAMBA[Number(selVal)];
+        const pZona = datosPuntosActivos[Number(selVal)];
         if (pZona) {
           tRealZona = +pZona.temp.toFixed(2);
           rRealZona = +pZona.rain.toFixed(2);
@@ -996,7 +1067,7 @@
           document.getElementById("subtitulo-arbitro").innerText = "Estación puntual: " + pZona.nombre;
         }
       } else {
-        document.getElementById("subtitulo-arbitro").innerText = "Promedio estaciones oficiales del AMBA";
+        document.getElementById("subtitulo-arbitro").innerText = "Promedio estaciones oficiales de " + prov.nombre;
       }
 
       tempRealArbitro = tRealZona;
@@ -1022,19 +1093,14 @@
       document.getElementById("real-rain").innerText = rRealZona.toFixed(1) + " mm";
       document.getElementById("real-wind").innerText = wRealZona.toFixed(0) + " km/h";
 
-      // Errores individuales de los 5 modelos
       const errSmnT = +Math.abs(tSmn - tempRealArbitro).toFixed(2);
       const errSmnR = +Math.abs(rSmn - rRealZona).toFixed(2);
-
       const errEcmwfT = +Math.abs(tEcmwf - tempRealArbitro).toFixed(2);
       const errEcmwfR = +Math.abs(rEcmwf - rRealZona).toFixed(2);
-
       const errGfsT = +Math.abs(tGfs - tempRealArbitro).toFixed(2);
       const errGfsR = +Math.abs(rGfs - rRealZona).toFixed(2);
-
       const errIconT = +Math.abs(tIcon - tempRealArbitro).toFixed(2);
       const errIconR = +Math.abs(rIcon - rRealZona).toFixed(2);
-
       const errJavT = +Math.abs(tJavier - tempRealArbitro).toFixed(2);
       const errJavR = +Math.abs(rJavier - rRealZona).toFixed(2);
 
@@ -1043,7 +1109,6 @@
       document.getElementById("err-smn-temp").innerText = "🌡️ Desvío Temp: ±" + errSmnT.toFixed(2) + " °C";
       document.getElementById("err-smn-rain").innerText = "🌧️ Desvío Agua: ±" + errSmnR.toFixed(1) + " mm";
 
-      // Mostrar los 3 modelos de Open-Meteo por separado con su desvío propio en el Cuadro 2
       document.getElementById("rt-om-ecmwf-row").innerText = tEcmwf.toFixed(1) + "°C | " + rEcmwf.toFixed(1) + "mm (±" + errEcmwfT.toFixed(2) + "°C)";
       document.getElementById("rt-om-gfs-row").innerText = tGfs.toFixed(1) + "°C | " + rGfs.toFixed(1) + "mm (±" + errGfsT.toFixed(2) + "°C)";
       document.getElementById("rt-om-icon-row").innerText = tIcon.toFixed(1) + "°C | " + rIcon.toFixed(1) + "mm (±" + errIconT.toFixed(2) + "°C)";
@@ -1053,19 +1118,17 @@
       document.getElementById("err-our-temp").innerText = "🌡️ Desvío Temp: ±" + errJavT.toFixed(2) + " °C";
       document.getElementById("err-our-rain").innerText = "🌧️ Desvío Agua: ±" + errJavR.toFixed(1) + " mm";
 
-      // Competencia entre los 5 modelos individuales
       const competidores5 = [
-        { grupo: "javier", cardId: "card-rt-javier", badgeId: "badge-rt-javier", nombre: "3. Modelo Javier", errT: errJavT, errR: errJavR, score: +(errJavT + errJavR * 1.5).toFixed(3), temp: tJavier },
-        { grupo: "om", cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2A. Open-Meteo (ECMWF)", errT: errEcmwfT, errR: errEcmwfR, score: +(errEcmwfT + errEcmwfR * 1.5).toFixed(3), temp: tEcmwf },
-        { grupo: "om", cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2B. Open-Meteo (GFS)", errT: errGfsT, errR: errGfsR, score: +(errGfsT + errGfsR * 1.5).toFixed(3), temp: tGfs },
-        { grupo: "om", cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2C. Open-Meteo (ICON)", errT: errIconT, errR: errIconR, score: +(errIconT + errIconR * 1.5).toFixed(3), temp: tIcon },
-        { grupo: "smn", cardId: "card-rt-smn", badgeId: "badge-rt-smn", nombre: "1. Oficial SMN", errT: errSmnT, errR: errSmnR, score: +(errSmnT + errSmnR * 1.5).toFixed(3), temp: tSmn }
+        { cardId: "card-rt-javier", badgeId: "badge-rt-javier", nombre: "3. Modelo Javier", errT: errJavT, errR: errJavR, score: +(errJavT + errJavR * 1.5).toFixed(3), temp: tJavier },
+        { cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2A. Open-Meteo (ECMWF)", errT: errEcmwfT, errR: errEcmwfR, score: +(errEcmwfT + errEcmwfR * 1.5).toFixed(3), temp: tEcmwf },
+        { cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2B. Open-Meteo (GFS)", errT: errGfsT, errR: errGfsR, score: +(errGfsT + errGfsR * 1.5).toFixed(3), temp: tGfs },
+        { cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2C. Open-Meteo (ICON)", errT: errIconT, errR: errIconR, score: +(errIconT + errIconR * 1.5).toFixed(3), temp: tIcon },
+        { cardId: "card-rt-smn", badgeId: "badge-rt-smn", nombre: "1. Oficial SMN", errT: errSmnT, errR: errSmnR, score: +(errSmnT + errSmnR * 1.5).toFixed(3), temp: tSmn }
       ].sort((a, b) => a.score - b.score);
 
       const ganadorAbsoluto = competidores5[0];
       const mejorOM = [competidores5.find(x => x.nombre.includes("ECMWF")), competidores5.find(x => x.nombre.includes("GFS")), competidores5.find(x => x.nombre.includes("ICON"))].sort((a,b) => a.score - b.score)[0];
 
-      // Resetear las 3 tarjetas
       ["card-rt-smn", "card-rt-om", "card-rt-javier"].forEach(id => {
         document.getElementById(id).className = "sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all";
       });
@@ -1076,7 +1139,6 @@
       document.getElementById("badge-rt-javier").className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
       document.getElementById("badge-rt-javier").innerText = "±" + errJavT.toFixed(2) + "°C";
 
-      // Pintar en Naranja la tarjeta que contiene al ganador de los 5
       document.getElementById(ganadorAbsoluto.cardId).className = "cuadro-ganador-naranja rounded-xl p-4 flex flex-col justify-between transition-all";
       document.getElementById(ganadorAbsoluto.badgeId).className = "text-[11px] px-2 py-0.5 rounded bg-orange-600 text-white font-extrabold shadow";
       document.getElementById(ganadorAbsoluto.badgeId).innerText = "🟠 🏆 1° " + ganadorAbsoluto.nombre;
@@ -1091,7 +1153,7 @@
 
       document.getElementById("linea-veredicto-rt").innerHTML =
         '<div class="sub-card bg-slate-950 border border-orange-500/50 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
-          '<span>🟠 <strong>1° entre los 5 Modelos (' + strHoraCerrada + '):</strong> <strong class="text-orange-400">' + liderT.nombre + '</strong></span>' +
+          '<span>🟠 <strong>1° en ' + prov.nombre + ' (' + strHoraCerrada + '):</strong> <strong class="text-orange-400">' + liderT.nombre + '</strong></span>' +
           '<span class="font-mono text-slate-300">' + liderT.temp.toFixed(2) + '°C vs ' + tempRealArbitro.toFixed(2) + '°C Real (±' + liderT.errT.toFixed(2) + '°C · 2°: ' + segT.nombre + ')</span>' +
         '</div>' +
         '<div class="sub-card bg-slate-950 border border-sky-500/40 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
@@ -1107,7 +1169,7 @@
       document.getElementById("c1-ts").innerText = "🕒 Emitido por 1. Oficial SMN: " + strHoraCerrada;
       document.getElementById("c2-ts").innerText = "🕒 Consulta 2. Open-Meteo: " + strHoraCerrada;
       document.getElementById("c3-ts").innerText = "🕒 Cálculo 3. Modelo Javier: " + strHoraCerrada;
-      document.getElementById("reloj-actualizacion").innerText = "✅ Corte " + strHoraCerrada;
+      document.getElementById("reloj-actualizacion").innerText = "✅ " + prov.nombre + " (" + strHoraCerrada + ")";
 
       cambiarHorizonte(horizonteActual);
       cambiarCapaMapa(modoMapaActual);
@@ -1125,14 +1187,16 @@
     }
 
     function renderizarDashboardHistorico() {
-      const historial = obtenerHistorialGuardado();
+      const prov = CATALOGO_PROVINCIAS[codigoProvinciaActiva];
+      const historial = obtenerHistorialGuardado().filter(r => r.provincia === codigoProvinciaActiva);
       const selVal = document.getElementById("selector-global-zona").value;
-      const nombreCiudadFiltro = selVal === "TODAS" ? "TODAS" : puntosAMBA[Number(selVal)]?.nombre;
+      const nombreCiudadFiltro = selVal === "TODAS" ? "TODAS" : prov.puntos[Number(selVal)]?.nombre;
 
       const fDesde = document.getElementById("fecha-desde-dash").value || "2026-10-12";
       const fHasta = document.getElementById("fecha-hasta-dash").value || "2099-12-31";
 
-      document.getElementById("explicacion-metodo-dash").innerText = "🧮 Motor Activo: " + pesosBMA.modo;
+      document.getElementById("titulo-dash-provincia").innerText = "Dashboard de Precisión Horaria — " + prov.nombre;
+      document.getElementById("explicacion-metodo-dash").innerText = "🧮 Motor Regional Activo: " + pesosBMA.modo;
 
       const filtrados = historial.filter(r => {
         const cumpleCiudad = (nombreCiudadFiltro === "TODAS" || r.ciudad === nombreCiudadFiltro);
@@ -1141,7 +1205,7 @@
         return cumpleCiudad && cumpleFecha;
       });
 
-      const etiquetaLugar = nombreCiudadFiltro === "TODAS" ? "Todo el AMBA (8 localidades)" : nombreCiudadFiltro;
+      const etiquetaLugar = nombreCiudadFiltro === "TODAS" ? "Todo " + prov.nombre + " (" + prov.puntos.length + " localidades)" : nombreCiudadFiltro;
 
       if (filtrados.length > 0) {
         const calcMedia = (campo) => +(filtrados.reduce((a, b) => a + Number(b[campo] || 0), 0) / filtrados.length).toFixed(2);
@@ -1164,10 +1228,9 @@
 
         const p1 = ranking5[0];
 
-        // RENDERIZAR LAS 5 TARJETAS DE RANKING (1° EN NARANJA, DEL 2° AL 5° CON SU POSICIÓN EXACTA)
         document.getElementById("conclusion-dashboard-box").innerHTML =
           '<div class="flex flex-wrap justify-between items-center text-xs text-slate-400 px-1">' +
-            '<span>📌 <strong>Ranking Completo de los 5 Modelos (00:00 hs a Hora Actual):</strong> <strong class="text-white">' + etiquetaLugar + '</strong></span>' +
+            '<span>📌 <strong>Ranking de los 5 Modelos en ' + etiquetaLugar + ':</strong></span>' +
             '<span>📅 Período: <strong>' + fDesde + '</strong> al <strong>' + fHasta + '</strong> (' + filtrados.length + ' cortes horarios :00 hs)</span>' +
           '</div>' +
           '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">' +
@@ -1175,7 +1238,7 @@
               const esPrimero = (idx === 0);
               const claseCard = esPrimero ? "cuadro-ganador-naranja rounded-xl p-3.5" : "sub-card bg-slate-950 border border-slate-800 rounded-xl p-3.5";
               const medalla = idx === 0 ? "🥇 1° MEJOR" : (idx === 1 ? "🥈 2° PUESTO" : (idx === 2 ? "🥉 3° PUESTO" : (idx + 1) + "° PUESTO"));
-              const diffTxt = idx === 0 ? "LÍDER" : "+" + (m.errT - p1.errT).toFixed(2) + "°C";
+              const diffTxt = idx === 0 ? "LÍDER REGIONAL" : "+" + (m.errT - p1.errT).toFixed(2) + "°C";
               return (
                 '<div class="' + claseCard + '">' +
                   '<div class="flex justify-between items-center mb-1">' +
@@ -1193,12 +1256,11 @@
             }).join("") +
           '</div>';
 
-        // TABLA CON LOS 5 MODELOS SEPARADOS
         const tbody = document.getElementById("tabla-historial-body");
         tbody.innerHTML = filtrados.slice(0, 160).map(r => (
           '<tr class="hover:bg-slate-800/40">' +
             '<td class="py-2 px-2.5 font-mono text-amber-300 font-semibold">' + r.fechaHora + '</td>' +
-            '<td class="py-2 px-2.5 font-semibold">' + r.ciudad + '</td>' +
+            '<td class="py-2 px-2.5 font-semibold"><span class="text-[10px] text-amber-400 block">' + r.provincia + '</span>' + r.ciudad + '</td>' +
             '<td class="py-2 px-2.5 font-bold text-emerald-400">🟢 ' + r.tempReal + '°C<br><span class="text-[10px] text-sky-400">🌧️ ' + r.rainReal + 'mm</span></td>' +
             '<td class="py-2 px-2.5">' + r.smnTemp + '°C | ' + r.smnRain + 'mm<span class="text-sky-400 block text-[10px]">(±' + r.errSmn + '°C | ±' + r.errSmnRain + 'mm)</span></td>' +
             '<td class="py-2 px-2.5">' + r.ecmwfTemp + '°C | ' + r.ecmwfRain + 'mm<span class="text-purple-400 block text-[10px]">(±' + r.errEcmwf + '°C | ±' + r.errEcmwfRain + 'mm)</span></td>' +
@@ -1211,7 +1273,6 @@
 
         if (seccionActiva !== 'seccion-dashboard') return;
 
-        // GRÁFICO 1: BARRAS DE ERROR DE LOS 5 MODELOS
         const ctxErr = document.getElementById("graficoDashboardErrores").getContext("2d");
         if (chartDashErrores) chartDashErrores.destroy();
         chartDashErrores = new Chart(ctxErr, {
@@ -1233,8 +1294,7 @@
           }
         });
 
-        // GRÁFICO 2: EVOLUCIÓN HORARIA DE LOS 5 MODELOS CONTRA LA REALIDAD
-        const ciudadMuestra = nombreCiudadFiltro === "TODAS" ? puntosAMBA[2].nombre : nombreCiudadFiltro;
+        const ciudadMuestra = nombreCiudadFiltro === "TODAS" ? prov.puntos[0].nombre : nombreCiudadFiltro;
         const seriePorHora = historial.filter(r => r.ciudad === ciudadMuestra).slice(0, 24).reverse();
 
         const ctxEvo = document.getElementById("graficoDashboardEvolucion").getContext("2d");
@@ -1267,14 +1327,14 @@
     function exportarHistorialCSV() {
       const historial = obtenerHistorialGuardado();
       if (!historial.length) return alert("Todavía no hay registros guardados.");
-      const cabeceras = "Fecha_ISO,Hora_Cerrada,Localidad,Temp_Real_C,Agua_Real_mm,1_SMN_Temp,Desvio_SMN_C,2A_ECMWF_Temp,Desvio_ECMWF_C,2B_GFS_Temp,Desvio_GFS_C,2C_ICON_Temp,Desvio_ICON_C,3_ModeloJavier_Temp,Desvio_Javier_C,Ganador_Hora\n";
+      const cabeceras = "Provincia,Fecha_ISO,Hora_Cerrada,Localidad,Temp_Real_C,Agua_Real_mm,1_SMN_Temp,Desvio_SMN_C,2A_ECMWF_Temp,Desvio_ECMWF_C,2B_GFS_Temp,Desvio_GFS_C,2C_ICON_Temp,Desvio_ICON_C,3_ModeloJavier_Temp,Desvio_Javier_C,Ganador_Hora\n";
       const filas = historial.map(r =>
-        `"${r.fechaISO || '2026-10-12'}","${r.fechaHora}","${r.ciudad}",${r.tempReal},${r.rainReal},${r.smnTemp},${r.errSmn},${r.ecmwfTemp},${r.errEcmwf},${r.gfsTemp},${r.errGfs},${r.iconTemp},${r.errIcon},${r.javierTemp},${r.errJavier},"${r.ganador}"`
+        `"${r.provincia || 'AMBA'}","${r.fechaISO || '2026-10-12'}","${r.fechaHora}","${r.ciudad}",${r.tempReal},${r.rainReal},${r.smnTemp},${r.errSmn},${r.ecmwfTemp},${r.errEcmwf},${r.gfsTemp},${r.errGfs},${r.iconTemp},${r.errIcon},${r.javierTemp},${r.errJavier},"${r.ganador}"`
       ).join("\n");
       const blob = new Blob([cabeceras + filas], { type: "text/csv;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "auditoria_5_modelos_meteo_arg_pro_v1_4.csv";
+      a.download = "auditoria_nacional_meteo_arg_pro_v1_5.csv";
       a.click();
     }
 
@@ -1287,7 +1347,7 @@
           const importados = JSON.parse(e.target.result);
           if (Array.isArray(importados)) {
             const actual = obtenerHistorialGuardado();
-            const unido = [...importados, ...actual].slice(0, 1200);
+            const unido = [...importados, ...actual].slice(0, 2500);
             localStorage.setItem(CLAVE_STORAGE, JSON.stringify(unido));
             renderizarDashboardHistorico();
             alert("Se importaron " + importados.length + " registros históricos con éxito.");
@@ -1301,7 +1361,7 @@
 
     function limpiarHistorialLocal() {
       localStorage.removeItem(CLAVE_STORAGE);
-      cargarDatosEnVivoAMBA(true);
+      cargarDatosProvinciaActiva(true);
     }
 
     function cambiarHorizonte(horas) {
@@ -1362,7 +1422,7 @@
       const rainBMA = (sumRainE * pesosBMA.ecmwf) + (sumRainI * pesosBMA.icon) + (sumRainG * pesosBMA.gfs);
       const rainOur = (rainBMA * factorHydroIR).toFixed(1);
 
-      const humMedia = datosPuntosAMBA[0]?.hum ?? 65;
+      const humMedia = datosPuntosActivos[0]?.hum ?? 65;
       const indAngstrom = calcularIndiceAngstrom(Number(maxOur), humMedia, Number(avgWind));
       const txtAngstrom = indAngstrom < 2.5 ? "🔴 Crítico (" + indAngstrom.toFixed(1) + ")" : (indAngstrom < 4.0 ? "🟡 Moderado (" + indAngstrom.toFixed(1) + ")" : "🟢 Bajo riesgo (" + indAngstrom.toFixed(1) + ")");
 
@@ -1494,7 +1554,7 @@
       capaElementosMapa.clearLayers();
       capaPinturaContinua._redraw();
 
-      datosPuntosAMBA.forEach(p => {
+      datosPuntosActivos.forEach(p => {
         let textoEtiqueta = "";
         if (modo === 'temp') textoEtiqueta = "🌡️ " + p.temp.toFixed(1) + "°C";
         else if (modo === 'wind') textoEtiqueta = flechaDireccionViento(p.dir) + " " + p.wind.toFixed(0) + " km/h";
@@ -1518,8 +1578,9 @@
       });
     }
 
-    cargarDatosEnVivoAMBA(false);
-    setInterval(() => cargarDatosEnVivoAMBA(false), 15 * 60 * 1000);
+    poblarSelectoresDeSubLocalidades();
+    cargarDatosProvinciaActiva(false);
+    setInterval(() => cargarDatosProvinciaActiva(false), 15 * 60 * 1000);
   </script>
 </body>
 </html>
