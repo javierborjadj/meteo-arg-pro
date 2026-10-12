@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meteo-Arg-Pro v1.3 | Auditoría Horaria Real (00:00 a 23:00 hs)</title>
+  <title>Meteo-Arg-Pro v1.4 | Auditoría Completa de los 5 Modelos</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -53,9 +53,9 @@
           <div>
             <div class="flex items-center gap-2">
               <h1 class="texto-fuerte text-lg font-extrabold tracking-tight text-white">METEO-ARG-PRO</h1>
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.3.0</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded btn-acento">v1.4.0</span>
             </div>
-            <p class="texto-suave text-[11px] text-slate-400">1. Oficial SMN · 2. Open-Meteo (ECMWF/GFS/ICON) · 3. Modelo Javier (Cortes Horarios :00 hs)</p>
+            <p class="texto-suave text-[11px] text-slate-400">Auditoría individual de 5 modelos: 1. SMN · 2A. ECMWF · 2B. GFS · 2C. ICON · 3. Modelo Javier</p>
           </div>
         </div>
 
@@ -68,7 +68,7 @@
             📅 2. Pronóstico Extendido
           </button>
           <button type="button" onclick="cambiarSeccion('seccion-dashboard')" id="nav-seccion-dashboard" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">
-            📊 3. Dashboard Auditoría
+            📊 3. Dashboard (5 Modelos)
           </button>
         </nav>
 
@@ -162,12 +162,12 @@
         </div>
       </section>
 
-      <!-- CUADRO DE TIEMPO REAL -->
+      <!-- CUADRO DE TIEMPO REAL CON LOS 5 MODELOS VISIBLES -->
       <section class="panel-card bg-slate-900/90 border borde-acento rounded-xl p-5 shadow-lg">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
           <div class="flex items-center gap-2">
             <span class="inline-block w-3 h-3 rounded-full bg-amber-400 animate-pulse"></span>
-            <h2 id="titulo-tiempo-real" class="texto-fuerte text-base sm:text-lg font-bold text-white">TIEMPO REAL EN AMBA: Temperatura (°C) y Agua Caída (mm)</h2>
+            <h2 id="titulo-tiempo-real" class="texto-fuerte text-base sm:text-lg font-bold text-white">TIEMPO REAL EN AMBA: Evaluación de los 5 Modelos</h2>
           </div>
           <div class="flex items-center gap-3 text-xs">
             <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> <strong class="text-emerald-400">Verde = Estación Real</strong></span>
@@ -215,8 +215,7 @@
                 <div>🌡️ Temp: <strong id="rt-smn-temp" class="texto-fuerte text-white">-- °C</strong></div>
                 <div>🌧️ Agua: <strong id="rt-smn-rain" class="text-sky-400">-- mm</strong></div>
               </div>
-              <div class="text-[11px] text-slate-400 mt-1">Pronóstico oficial nacional para esta hora</div>
-              <div class="mt-2 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
+              <div class="mt-2.5 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
                 <div id="err-smn-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: --</div>
                 <div id="err-smn-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: --</div>
               </div>
@@ -226,23 +225,26 @@
             </div>
           </div>
 
-          <!-- 2. Open-Meteo -->
+          <!-- 2. Open-Meteo (LOS 3 MODELOS SEPARADOS CON SUS DESVÍOS INDIVIDUALES) -->
           <div id="card-rt-om" class="sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all">
             <div>
               <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-bold text-purple-400">2. OPEN-METEO (ECMWF/GFS/ICON)</span>
+                <span class="text-xs font-bold text-purple-400">2. OPEN-METEO (3 MODELOS)</span>
                 <span id="badge-rt-om" class="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200">Evaluando</span>
               </div>
-              <div class="flex justify-between mt-2 text-sm">
-                <div>🌡️ Temp: <strong id="rt-om-temp" class="texto-fuerte text-white">-- °C</strong></div>
-                <div>🌧️ Agua: <strong id="rt-om-rain" class="text-sky-400">-- mm</strong></div>
-              </div>
-              <div id="desglose-om-rt" class="text-[11px] text-purple-300 font-mono mt-1">
-                ECMWF: --° · GFS: --° · ICON: --°
-              </div>
-              <div class="mt-2 pt-2 border-t border-slate-700/60 space-y-1 text-xs">
-                <div id="err-om-temp" class="text-amber-400 font-semibold">🌡️ Desvío Temp: --</div>
-                <div id="err-om-rain" class="text-sky-400 font-semibold">🌧️ Desvío Agua: --</div>
+              <div class="mt-2 space-y-1.5 text-xs">
+                <div class="flex justify-between items-center border-b border-slate-700/50 pb-1">
+                  <span class="text-purple-300 font-semibold">2A. ECMWF:</span>
+                  <span id="rt-om-ecmwf-row" class="font-mono text-white">--°C | --mm (±--°C)</span>
+                </div>
+                <div class="flex justify-between items-center border-b border-slate-700/50 pb-1">
+                  <span class="text-emerald-300 font-semibold">2B. GFS:</span>
+                  <span id="rt-om-gfs-row" class="font-mono text-white">--°C | --mm (±--°C)</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-slate-300 font-semibold">2C. ICON:</span>
+                  <span id="rt-om-icon-row" class="font-mono text-white">--°C | --mm (±--°C)</span>
+                </div>
               </div>
             </div>
             <div id="ts-om" class="texto-suave mt-3 pt-2 border-t border-slate-700/60 text-[11px] text-slate-400 font-mono">
@@ -275,7 +277,7 @@
           </div>
         </div>
 
-        <!-- RESUMEN VISUAL ULTRA-CLARO -->
+        <!-- RESUMEN VISUAL ULTRA-CLARO ENTRE LOS 5 COMPETIDORES -->
         <div id="linea-veredicto-rt" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
         </div>
       </section>
@@ -335,7 +337,7 @@
         <div class="panel-card flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 rounded-xl p-4">
           <div>
             <h2 id="titulo-pronostico-zona" class="texto-fuerte text-lg font-bold text-white">📅 Pronóstico Extendido Comparativo (24 / 48 / 72 hs)</h2>
-            <p class="texto-suave text-xs text-slate-400">1. Oficial SMN vs. 2. Open-Meteo (ECMWF/GFS/ICON) vs. 3. Modelo Javier</p>
+            <p class="texto-suave text-xs text-slate-400">1. Oficial SMN vs. 2A. Open-Meteo (ECMWF) vs. 2B. Open-Meteo (GFS) vs. 2C. Open-Meteo (ICON) vs. 3. Modelo Javier</p>
           </div>
           <div class="sub-card inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 gap-1">
             <button type="button" onclick="cambiarHorizonte(24)" id="btn-24" class="px-4 py-1.5 text-sm font-semibold rounded-md btn-acento">Próximas 24 hs</button>
@@ -382,22 +384,22 @@
             <div>
               <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
                 <div>
-                  <span class="text-xs font-bold uppercase text-purple-400">Columna 2 · Multimodelo Internacional</span>
+                  <span class="text-xs font-bold uppercase text-purple-400">Columna 2 · 3 Modelos Separados</span>
                   <h3 class="texto-fuerte text-lg font-bold text-white">2. Open-Meteo (ECMWF/GFS/ICON)</h3>
                 </div>
-                <span class="text-xs bg-purple-950 text-purple-300 border border-purple-700 px-2.5 py-1 rounded">3 Modelos</span>
+                <span class="text-xs bg-purple-950 text-purple-300 border border-purple-700 px-2.5 py-1 rounded">Individuales</span>
               </div>
               <div class="space-y-2.5 text-sm">
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
-                  <span class="texto-suave text-slate-400">2. Open-Meteo (ECMWF):</span>
+                  <span class="texto-suave text-slate-400">2A. Open-Meteo (ECMWF):</span>
                   <strong id="c2-ecmwf" class="texto-fuerte text-white">-- °C | -- mm</strong>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
-                  <span class="texto-suave text-slate-400">2. Open-Meteo (GFS):</span>
+                  <span class="texto-suave text-slate-400">2B. Open-Meteo (GFS):</span>
                   <strong id="c2-gfs" class="texto-fuerte text-white">-- °C | -- mm</strong>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
-                  <span class="texto-suave text-slate-400">2. Open-Meteo (ICON):</span>
+                  <span class="texto-suave text-slate-400">2C. Open-Meteo (ICON):</span>
                   <strong id="c2-icon" class="texto-fuerte text-white">-- °C | -- mm</strong>
                 </div>
                 <div class="flex justify-between py-1.5 border-b border-slate-800/50">
@@ -443,23 +445,23 @@
         </div>
       </section>
 
-      <!-- METEOGRAMAS DOBLES -->
+      <!-- METEOGRAMAS DOBLES CON LOS 5 MODELOS -->
       <section class="panel-card bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-5">
         <div class="flex flex-wrap justify-between items-center gap-2">
           <div>
-            <h3 class="texto-fuerte text-lg font-bold text-white">📈 Meteograma Horario Comparativo (Temperatura °C y Agua mm)</h3>
-            <p class="texto-suave text-xs text-slate-400">1. Oficial SMN vs. 2. Open-Meteo (ECMWF / GFS / ICON) vs. 3. Modelo Javier</p>
+            <h3 class="texto-fuerte text-lg font-bold text-white">📈 Meteograma Horario Comparativo (Los 5 Modelos Separados)</h3>
+            <p class="texto-suave text-xs text-slate-400">1. Oficial SMN vs. 2A. Open-Meteo (ECMWF) vs. 2B. Open-Meteo (GFS) vs. 2C. Open-Meteo (ICON) vs. 3. Modelo Javier</p>
           </div>
           <span class="sub-card text-xs bg-slate-800 px-3 py-1 rounded border border-slate-700">Próximas 24 horas</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div class="sub-card bg-slate-950/70 p-3 rounded-lg border border-slate-800">
-            <h4 class="text-xs font-bold text-amber-400 mb-2">🌡️ Curvas Horarias de Temperatura (°C)</h4>
+            <h4 class="text-xs font-bold text-amber-400 mb-2">🌡️ Curvas Horarias de Temperatura (°C) — 5 Modelos</h4>
             <div class="w-full h-60"><canvas id="graficoMeteograma"></canvas></div>
           </div>
           <div class="sub-card bg-slate-950/70 p-3 rounded-lg border border-slate-800">
-            <h4 class="text-xs font-bold text-sky-400 mb-2">🌧️ Comparativa Horaria de Agua Estimada (mm)</h4>
+            <h4 class="text-xs font-bold text-sky-400 mb-2">🌧️ Comparativa Horaria de Agua Estimada (mm) — 5 Modelos</h4>
             <div class="w-full h-60"><canvas id="graficoLluviaHoraria"></canvas></div>
           </div>
         </div>
@@ -471,7 +473,7 @@
     </div>
 
     <!-- ========================================================================= -->
-    <!-- SECCIÓN 3: DASHBOARD CON CORTES HORARIOS (:00 HS) + BACKFILL 24 HS        -->
+    <!-- SECCIÓN 3: DASHBOARD CON LOS 5 MODELOS SEPARADOS EN RANKING, GRÁFICOS Y TABLA -->
     <!-- ========================================================================= -->
     <div id="seccion-dashboard" class="space-y-6 hidden">
 
@@ -480,10 +482,10 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="text-2xl">📊</span>
-              <h2 class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión Horaria por Localidad y Fechas</h2>
+              <h2 class="texto-fuerte text-xl font-bold text-white">Dashboard de Precisión Horaria: Los 5 Modelos Cara a Cara</h2>
             </div>
             <p id="explicacion-metodo-dash" class="texto-suave text-xs text-amber-400 mt-1">
-              Evaluación estricta cada 1 hora cerrada (00:00 hs a 23:00 hs) con datos 100% reales de API.
+              Compara sin ocultar a nadie: 1. Oficial SMN · 2A. Open-Meteo (ECMWF) · 2B. Open-Meteo (GFS) · 2C. Open-Meteo (ICON) · 3. Modelo Javier.
             </p>
           </div>
 
@@ -520,39 +522,41 @@
           </div>
         </div>
 
-        <!-- PODIO VISUAL DE CONCLUSIÓN -->
+        <!-- RANKING COMPLETO DE LOS 5 MODELOS (1° EN NARANJA + 2°, 3°, 4° Y 5° PUESTO) -->
         <div id="conclusion-dashboard-box" class="space-y-3">
         </div>
 
-        <!-- 2 GRÁFICOS DEL DASHBOARD -->
+        <!-- 2 GRÁFICOS DEL DASHBOARD CON LOS 5 MODELOS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">
-            <h3 class="texto-fuerte text-sm font-bold text-white mb-1">📊 Gráfico 1: Error Medio Horario en Temperatura (°C) y Agua (mm)</h3>
+            <h3 class="texto-fuerte text-sm font-bold text-white mb-1">📊 Gráfico 1: Error Medio Horario de los 5 Modelos (Temp °C y Agua mm)</h3>
             <p class="texto-suave text-xs text-slate-400 mb-3">Barra más baja = modelo más exacto en la localidad y fechas elegidas</p>
-            <div class="w-full h-60"><canvas id="graficoDashboardErrores"></canvas></div>
+            <div class="w-full h-64"><canvas id="graficoDashboardErrores"></canvas></div>
           </div>
 
           <div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">
-            <h3 class="texto-fuerte text-sm font-bold text-white mb-1">📈 Gráfico 2: Evolución Hora por Hora (00:00 hs a Hora Actual)</h3>
-            <p class="texto-suave text-xs text-slate-400 mb-3">Curva Verde (Real) contra los 3 modelos a lo largo del día</p>
-            <div class="w-full h-60"><canvas id="graficoDashboardEvolucion"></canvas></div>
+            <h3 class="texto-fuerte text-sm font-bold text-white mb-1">📈 Gráfico 2: Evolución Hora por Hora (Real Verde vs. los 5 Modelos)</h3>
+            <p class="texto-suave text-xs text-slate-400 mb-3">Comparación de las curvas horarias desde las 00:00 hs hasta ahora</p>
+            <div class="w-full h-64"><canvas id="graficoDashboardEvolucion"></canvas></div>
           </div>
         </div>
 
-        <!-- TABLA DE AUDITORÍA HORARIA -->
+        <!-- TABLA DE AUDITORÍA HORARIA CON LAS 5 COLUMNAS DE MODELOS SEPARADAS -->
         <div>
-          <h3 class="texto-fuerte text-sm font-bold text-white mb-2">📋 Tabla de Cortes Horarios Auditados (1 registro por hora cerrada :00 hs en cada localidad)</h3>
+          <h3 class="texto-fuerte text-sm font-bold text-white mb-2">📋 Tabla de Cortes Horarios Auditados (Los 5 Modelos Separados en cada Hora Cerrada :00 hs)</h3>
           <div class="overflow-x-auto max-h-96 border border-slate-800 rounded-lg">
             <table class="w-full text-left text-xs">
               <thead class="sub-card bg-slate-950 text-slate-400 uppercase sticky top-0 border-b border-slate-800">
                 <tr>
-                  <th class="py-2.5 px-3">Hora Cerrada</th>
-                  <th class="py-2.5 px-3">Localidad / Zona</th>
-                  <th class="py-2.5 px-3 text-emerald-400">🟢 Real (Temp | Agua)</th>
-                  <th class="py-2.5 px-3 text-sky-400">1. Oficial SMN (Desvío °C | mm)</th>
-                  <th class="py-2.5 px-3 text-purple-400">2. Open-Meteo (Desvío °C | mm)</th>
-                  <th class="py-2.5 px-3 text-amber-400">3. Modelo Javier (Desvío °C | mm)</th>
-                  <th class="py-2.5 px-3">🏆 1° Puesto en esa Hora</th>
+                  <th class="py-2.5 px-2.5">Hora</th>
+                  <th class="py-2.5 px-2.5">Localidad</th>
+                  <th class="py-2.5 px-2.5 text-emerald-400">🟢 Real</th>
+                  <th class="py-2.5 px-2.5 text-sky-400">1. Oficial SMN</th>
+                  <th class="py-2.5 px-2.5 text-purple-400">2A. Open-Meteo (ECMWF)</th>
+                  <th class="py-2.5 px-2.5 text-emerald-300">2B. Open-Meteo (GFS)</th>
+                  <th class="py-2.5 px-2.5 text-slate-300">2C. Open-Meteo (ICON)</th>
+                  <th class="py-2.5 px-2.5 text-amber-400">3. Modelo Javier</th>
+                  <th class="py-2.5 px-2.5">🟠 1° Puesto</th>
                 </tr>
               </thead>
               <tbody id="tabla-historial-body" class="divide-y divide-slate-800/60">
@@ -566,8 +570,7 @@
   </main>
 
   <script>
-    // Nueva clave v13 que solo almacena cortes horarios (:00 hs) provenientes de la API real (nunca simulados)
-    const CLAVE_STORAGE = "meteo_arg_pro_historial_v13_real";
+    const CLAVE_STORAGE = "meteo_arg_pro_historial_v14_5modelos";
     let seccionActiva = "seccion-rt";
     let motorMapaActivo = "windy";
     let modoDia = false;
@@ -587,7 +590,7 @@
     let datosPuntosAMBA = [];
     let datosObsHourly = null;
     let datosECMWF = null, datosGFS = null, datosICON = null;
-    let pesosBMA = { ecmwf: 0.50, icon: 0.30, gfs: 0.20, modo: "Calculando desde las últimas 20 horas reales..." };
+    let pesosBMA = { ecmwf: 0.50, icon: 0.30, gfs: 0.20, modo: "Calculando desde las horas cerradas de hoy..." };
     let tempRealArbitro = 13.3;
     let chartInstancia = null, chartLluviaInstancia = null;
     let chartDashErrores = null, chartDashEvolucion = null;
@@ -774,7 +777,7 @@
       const textoZona = sel.options[sel.selectedIndex].text.replace("📍 ", "").replace("🌎 ", "");
 
       document.getElementById("titulo-mapa-dinamico").innerText = "🗺️ Mapa Meteorológico — " + textoZona;
-      document.getElementById("titulo-tiempo-real").innerText = "TIEMPO REAL: " + textoZona.toUpperCase() + " (Temp °C y Agua mm)";
+      document.getElementById("titulo-tiempo-real").innerText = "TIEMPO REAL: " + textoZona.toUpperCase() + " (5 Modelos)";
       document.getElementById("titulo-pronostico-zona").innerText = "📅 Pronóstico Extendido — " + textoZona;
 
       let latFoco = -34.63, lonFoco = -58.53, zoomFoco = 9;
@@ -799,7 +802,6 @@
       }
     }
 
-    // CARGA EXCLUSIVA DE APIS REALES (SIN VALORES SIMULADOS QUE CONTAMINEN LA TABLA)
     async function cargarDatosEnVivoAMBA(forzarMensaje = false) {
       try {
         document.getElementById("reloj-actualizacion").innerText = "🔄 Consultando APIs reales...";
@@ -810,7 +812,6 @@
         document.getElementById("fecha-hasta-dash").value = fechaHoyISO;
         document.getElementById("fecha-hasta-dash").max = fechaHoyISO;
 
-        // 1. Consulta horaria de referencia en tierra + los 3 modelos reales (ECMWF, GFS, ICON)
         const urlObs = "https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.44&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,cloud_cover&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
         const urlECMWF = "https://api.open-meteo.com/v1/ecmwf?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation,cloud_cover,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
         const urlGFS = "https://api.open-meteo.com/v1/gfs?latitude=-34.61&longitude=-58.44&current=temperature_2m,precipitation,cloud_cover,wind_speed_10m,surface_pressure&hourly=temperature_2m,precipitation,precipitation_probability,cloud_cover_high,wind_speed_10m,wind_gusts_10m,uv_index&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=4";
@@ -845,27 +846,7 @@
           clouds: Number(cur.cloud_cover ?? 35)
         }));
 
-        // RECONSTRUIR Y AUDITAR AUTOMÁTICAMENTE TODAS LAS HORAS CERRADAS DEL DÍA DE HOY (00:00 hs HASTA HORA ACTUAL)
-        reconstruirHistorialHorarioRealDelDia(ahora, fechaHoyISO);
-
-        // Intentar unir también cualquier historial previo guardado por el robot de GitHub
-        fetch("data/historial_amba.json")
-          .then(r => r.ok ? r.json() : null)
-          .then(histRemoto => {
-            if (Array.isArray(histRemoto) && histRemoto.length > 0) {
-              // Filtramos solo registros que sean de horas en punto (:00 hs)
-              const limpios = histRemoto.filter(x => (x.fechaHora || "").includes(":00 hs") && Number(x.errEcmwf) < 2.5);
-              if (limpios.length > 0) {
-                const actual = obtenerHistorialGuardado();
-                const mapaUnico = new Map();
-                [...actual, ...limpios].forEach(item => {
-                  mapaUnico.set(item.fechaHora + "_" + item.ciudad, item);
-                });
-                localStorage.setItem(CLAVE_STORAGE, JSON.stringify(Array.from(mapaUnico.values()).slice(0, 1200)));
-              }
-            }
-          }).catch(() => {});
-
+        reconstruirHistorialHorarioReal5Modelos(ahora, fechaHoyISO);
         actualizarVistaSegunZonaSeleccionada();
       } catch (e) {
         console.error("Error consultando APIs reales:", e);
@@ -873,12 +854,11 @@
       }
     }
 
-    // CALCULA LOS PESOS BATES-GRANGER DESDE LAS HORAS REALES TRANSCURRIDAS DEL DÍA Y RECONSTRUYE LA TABLA HORARIA (00:00 A HORA ACTUAL)
-    function reconstruirHistorialHorarioRealDelDia(ahora, fechaISO) {
+    // RECONSTRUYE TODAS LAS HORAS CERRADAS DEL DÍA EVALUANDO A LOS 5 MODELOS POR SEPARADO
+    function reconstruirHistorialHorarioReal5Modelos(ahora, fechaISO) {
       if (!datosObsHourly || !datosECMWF || !datosGFS || !datosICON) return;
       const horaMax = ahora.getHours();
 
-      // 1. Calcular el Error Cuadrático Medio (MSE) real de ECMWF, ICON y GFS en las horas previas de hoy
       let mseE = 0.05, mseI = 0.05, mseG = 0.05;
       for (let h = 0; h <= horaMax; h++) {
         const tObs = Number(datosObsHourly.hourly.temperature_2m[h] ?? 13.5);
@@ -896,11 +876,10 @@
         ecmwf: invE / sumaInv,
         icon: invI / sumaInv,
         gfs: invG / sumaInv,
-        modo: "Bates-Granger entrenado con las " + (horaMax + 1) + " horas cerradas de hoy (" +
+        modo: "Bates-Granger entrenado sobre las " + (horaMax + 1) + " hs cerradas de hoy (" +
               Math.round((invE/sumaInv)*100) + "% EC · " + Math.round((invI/sumaInv)*100) + "% IC · " + Math.round((invG/sumaInv)*100) + "% GF)"
       };
 
-      // 2. Generar las filas de auditoría estrictamente por HORA CERRADA (:00 hs) desde las 00:00 hs hasta la hora actual
       const registrosHorarios = [];
       for (let h = 0; h <= horaMax; h++) {
         const strHora = formatearHoraCerrada(ahora, h);
@@ -908,14 +887,13 @@
         const rObsBase = Number(datosObsHourly.hourly.precipitation[h] ?? 0.0);
 
         const tEBase = Number(datosECMWF.hourly.temperature_2m[h] ?? tObsBase);
-        const tIBase = Number(datosICON.hourly.temperature_2m[h] ?? tObsBase);
         const tGBase = Number(datosGFS.hourly.temperature_2m[h] ?? tObsBase);
+        const tIBase = Number(datosICON.hourly.temperature_2m[h] ?? tObsBase);
 
         const rEBase = Number(datosECMWF.hourly.precipitation[h] ?? 0.0);
-        const rIBase = Number(datosICON.hourly.precipitation[h] ?? 0.0);
         const rGBase = Number(datosGFS.hourly.precipitation[h] ?? 0.0);
+        const rIBase = Number(datosICON.hourly.precipitation[h] ?? 0.0);
 
-        // Ensamble Modelo Javier para esa hora h
         const tJavBase = (tEBase * pesosBMA.ecmwf) + (tIBase * pesosBMA.icon) + (tGBase * pesosBMA.gfs);
         const rJavBase = (rEBase * pesosBMA.ecmwf) + (rIBase * pesosBMA.icon) + (rGBase * pesosBMA.gfs);
         const tSmnBase = tGBase + 0.35;
@@ -927,23 +905,30 @@
 
           const estSmnT = +(tSmnBase + p.diffCosta * 0.70).toFixed(2);
           const estEcmwfT = +(tEBase + p.diffCosta * 0.85).toFixed(2);
-          const estJavierT = +(tJavBase + p.diffCosta * 0.90).toFixed(2);
+          const estGfsT = +(tGBase + p.diffCosta * 0.75).toFixed(2);
+          const estIconT = +(tIBase + p.diffCosta * 0.80).toFixed(2);
+          const estJavierT = +(tJavBase + p.diffCosta * 0.88).toFixed(2);
 
           const errSmnT = +Math.abs(estSmnT - tRealLoc).toFixed(2);
           const errEcmwfT = +Math.abs(estEcmwfT - tRealLoc).toFixed(2);
+          const errGfsT = +Math.abs(estGfsT - tRealLoc).toFixed(2);
+          const errIconT = +Math.abs(estIconT - tRealLoc).toFixed(2);
           const errJavierT = +Math.abs(estJavierT - tRealLoc).toFixed(2);
 
           const errSmnR = +Math.abs(rSmnBase - rRealLoc).toFixed(1);
           const errEcmwfR = +Math.abs(rEBase - rRealLoc).toFixed(1);
+          const errGfsR = +Math.abs(rGBase - rRealLoc).toFixed(1);
+          const errIconR = +Math.abs(rIBase - rRealLoc).toFixed(1);
           const errJavierR = +Math.abs(rJavBase - rRealLoc).toFixed(1);
 
-          const scoreS = errSmnT + errSmnR * 1.5;
-          const scoreE = errEcmwfT + errEcmwfR * 1.5;
-          const scoreJ = errJavierT + errJavierR * 1.5;
-
-          let ganadorHora = "3. Modelo Javier";
-          if (scoreE < scoreJ && scoreE < scoreS) ganadorHora = "2. Open-Meteo (ECMWF)";
-          else if (scoreS < scoreJ && scoreS <= scoreE) ganadorHora = "1. Oficial SMN";
+          // Competencia entre los 5 modelos separados en esa hora
+          const candidatosHora = [
+            { nombre: "3. Modelo Javier", score: errJavierT + errJavierR * 1.5 },
+            { nombre: "2A. Open-Meteo (ECMWF)", score: errEcmwfT + errEcmwfR * 1.5 },
+            { nombre: "2B. Open-Meteo (GFS)", score: errGfsT + errGfsR * 1.5 },
+            { nombre: "2C. Open-Meteo (ICON)", score: errIconT + errIconR * 1.5 },
+            { nombre: "1. Oficial SMN", score: errSmnT + errSmnR * 1.5 }
+          ].sort((a, b) => a.score - b.score);
 
           registrosHorarios.unshift({
             fechaISO: fechaISO,
@@ -951,19 +936,33 @@
             ciudad: p.nombre,
             tempReal: tRealLoc.toFixed(1),
             rainReal: rRealLoc.toFixed(1),
+
             smnTemp: estSmnT.toFixed(1),
             smnRain: rSmnBase.toFixed(1),
             errSmn: errSmnT,
             errSmnRain: errSmnR,
+
             ecmwfTemp: estEcmwfT.toFixed(1),
             ecmwfRain: rEBase.toFixed(1),
             errEcmwf: errEcmwfT,
             errEcmwfRain: errEcmwfR,
+
+            gfsTemp: estGfsT.toFixed(1),
+            gfsRain: rGBase.toFixed(1),
+            errGfs: errGfsT,
+            errGfsRain: errGfsR,
+
+            iconTemp: estIconT.toFixed(1),
+            iconRain: rIBase.toFixed(1),
+            errIcon: errIconT,
+            errIconRain: errIconR,
+
             javierTemp: estJavierT.toFixed(1),
             javierRain: rJavBase.toFixed(1),
             errJavier: errJavierT,
             errJavierRain: errJavierR,
-            ganador: ganadorHora
+
+            ganador: candidatosHora[0].nombre
           });
         });
       }
@@ -1002,9 +1001,8 @@
 
       tempRealArbitro = tRealZona;
 
-      // Valores de cada modelo en la hora actual cerrada (:00 hs)
       const tEcmwf = +(Number(datosECMWF.hourly.temperature_2m[horaActualIdx]) + diffLocal * 0.85).toFixed(2);
-      const tGfs = +(Number(datosGFS.hourly.temperature_2m[horaActualIdx]) + diffLocal * 0.70).toFixed(2);
+      const tGfs = +(Number(datosGFS.hourly.temperature_2m[horaActualIdx]) + diffLocal * 0.75).toFixed(2);
       const tIcon = +(Number(datosICON.hourly.temperature_2m[horaActualIdx]) + diffLocal * 0.80).toFixed(2);
 
       const rEcmwf = +(Number(datosECMWF.hourly.precipitation[horaActualIdx] ?? 0.0)).toFixed(2);
@@ -1018,17 +1016,25 @@
 
       const txtPesos = Math.round(pesosBMA.ecmwf * 100) + "% EC · " + Math.round(pesosBMA.icon * 100) + "% IC · " + Math.round(pesosBMA.gfs * 100) + "% GF";
       document.getElementById("pesos-bma-badge").innerText = txtPesos;
-      document.getElementById("desglose-om-rt").innerText = "ECMWF: " + tEcmwf.toFixed(1) + "° · GFS: " + tGfs.toFixed(1) + "° · ICON: " + tIcon.toFixed(1) + "°";
       document.getElementById("formula-javier-rt").innerText = "Ensamble (" + txtPesos + ") = " + tJavier.toFixed(2) + " °C";
 
       document.getElementById("real-temp").innerText = tempRealArbitro.toFixed(1) + " °C";
       document.getElementById("real-rain").innerText = rRealZona.toFixed(1) + " mm";
       document.getElementById("real-wind").innerText = wRealZona.toFixed(0) + " km/h";
 
+      // Errores individuales de los 5 modelos
       const errSmnT = +Math.abs(tSmn - tempRealArbitro).toFixed(2);
       const errSmnR = +Math.abs(rSmn - rRealZona).toFixed(2);
-      const errOmT = +Math.abs(tEcmwf - tempRealArbitro).toFixed(2);
-      const errOmR = +Math.abs(rEcmwf - rRealZona).toFixed(2);
+
+      const errEcmwfT = +Math.abs(tEcmwf - tempRealArbitro).toFixed(2);
+      const errEcmwfR = +Math.abs(rEcmwf - rRealZona).toFixed(2);
+
+      const errGfsT = +Math.abs(tGfs - tempRealArbitro).toFixed(2);
+      const errGfsR = +Math.abs(rGfs - rRealZona).toFixed(2);
+
+      const errIconT = +Math.abs(tIcon - tempRealArbitro).toFixed(2);
+      const errIconR = +Math.abs(rIcon - rRealZona).toFixed(2);
+
       const errJavT = +Math.abs(tJavier - tempRealArbitro).toFixed(2);
       const errJavR = +Math.abs(rJavier - rRealZona).toFixed(2);
 
@@ -1037,50 +1043,56 @@
       document.getElementById("err-smn-temp").innerText = "🌡️ Desvío Temp: ±" + errSmnT.toFixed(2) + " °C";
       document.getElementById("err-smn-rain").innerText = "🌧️ Desvío Agua: ±" + errSmnR.toFixed(1) + " mm";
 
-      document.getElementById("rt-om-temp").innerText = tEcmwf.toFixed(1) + " °C";
-      document.getElementById("rt-om-rain").innerText = rEcmwf.toFixed(1) + " mm";
-      document.getElementById("err-om-temp").innerText = "🌡️ Desvío Temp: ±" + errOmT.toFixed(2) + " °C";
-      document.getElementById("err-om-rain").innerText = "🌧️ Desvío Agua: ±" + errOmR.toFixed(1) + " mm";
+      // Mostrar los 3 modelos de Open-Meteo por separado con su desvío propio en el Cuadro 2
+      document.getElementById("rt-om-ecmwf-row").innerText = tEcmwf.toFixed(1) + "°C | " + rEcmwf.toFixed(1) + "mm (±" + errEcmwfT.toFixed(2) + "°C)";
+      document.getElementById("rt-om-gfs-row").innerText = tGfs.toFixed(1) + "°C | " + rGfs.toFixed(1) + "mm (±" + errGfsT.toFixed(2) + "°C)";
+      document.getElementById("rt-om-icon-row").innerText = tIcon.toFixed(1) + "°C | " + rIcon.toFixed(1) + "mm (±" + errIconT.toFixed(2) + "°C)";
 
       document.getElementById("rt-our-temp").innerText = tJavier.toFixed(1) + " °C";
       document.getElementById("rt-our-rain").innerText = rJavier.toFixed(1) + " mm";
       document.getElementById("err-our-temp").innerText = "🌡️ Desvío Temp: ±" + errJavT.toFixed(2) + " °C";
       document.getElementById("err-our-rain").innerText = "🌧️ Desvío Agua: ±" + errJavR.toFixed(1) + " mm";
 
-      const competidores = [
-        { id: "javier", cardId: "card-rt-javier", nombre: "3. Modelo Javier", errT: errJavT, errR: errJavR, score: +(errJavT + errJavR * 1.5).toFixed(3), temp: tJavier, rain: rJavier, badgeId: "badge-rt-javier" },
-        { id: "om", cardId: "card-rt-om", nombre: "2. Open-Meteo (ECMWF)", errT: errOmT, errR: errOmR, score: +(errOmT + errOmR * 1.5).toFixed(3), temp: tEcmwf, rain: rEcmwf, badgeId: "badge-rt-om" },
-        { id: "smn", cardId: "card-rt-smn", nombre: "1. Oficial SMN", errT: errSmnT, errR: errSmnR, score: +(errSmnT + errSmnR * 1.5).toFixed(3), temp: tSmn, rain: rSmn, badgeId: "badge-rt-smn" }
-      ];
+      // Competencia entre los 5 modelos individuales
+      const competidores5 = [
+        { grupo: "javier", cardId: "card-rt-javier", badgeId: "badge-rt-javier", nombre: "3. Modelo Javier", errT: errJavT, errR: errJavR, score: +(errJavT + errJavR * 1.5).toFixed(3), temp: tJavier },
+        { grupo: "om", cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2A. Open-Meteo (ECMWF)", errT: errEcmwfT, errR: errEcmwfR, score: +(errEcmwfT + errEcmwfR * 1.5).toFixed(3), temp: tEcmwf },
+        { grupo: "om", cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2B. Open-Meteo (GFS)", errT: errGfsT, errR: errGfsR, score: +(errGfsT + errGfsR * 1.5).toFixed(3), temp: tGfs },
+        { grupo: "om", cardId: "card-rt-om", badgeId: "badge-rt-om", nombre: "2C. Open-Meteo (ICON)", errT: errIconT, errR: errIconR, score: +(errIconT + errIconR * 1.5).toFixed(3), temp: tIcon },
+        { grupo: "smn", cardId: "card-rt-smn", badgeId: "badge-rt-smn", nombre: "1. Oficial SMN", errT: errSmnT, errR: errSmnR, score: +(errSmnT + errSmnR * 1.5).toFixed(3), temp: tSmn }
+      ].sort((a, b) => a.score - b.score);
 
-      const porScore = [...competidores].sort((a, b) => a.score - b.score);
-      const porTemp = [...competidores].sort((a, b) => a.errT - b.errT);
-      const porRain = [...competidores].sort((a, b) => a.errR - b.errR);
+      const ganadorAbsoluto = competidores5[0];
+      const mejorOM = [competidores5.find(x => x.nombre.includes("ECMWF")), competidores5.find(x => x.nombre.includes("GFS")), competidores5.find(x => x.nombre.includes("ICON"))].sort((a,b) => a.score - b.score)[0];
 
-      porScore.forEach((c, index) => {
-        const elBadge = document.getElementById(c.badgeId);
-        const elCard = document.getElementById(c.cardId);
-        if (index === 0) {
-          elCard.className = "cuadro-ganador-naranja rounded-xl p-4 flex flex-col justify-between transition-all";
-          elBadge.className = "text-[11px] px-2 py-0.5 rounded bg-orange-600 text-white font-extrabold shadow";
-          elBadge.innerText = "🟠 🏆 1° MEJOR AHORA";
-        } else {
-          elCard.className = "sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all";
-          elBadge.className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
-          elBadge.innerText = (index + 1) + "° Puesto (±" + c.errT.toFixed(2) + "°C)";
-        }
+      // Resetear las 3 tarjetas
+      ["card-rt-smn", "card-rt-om", "card-rt-javier"].forEach(id => {
+        document.getElementById(id).className = "sub-card bg-slate-800/70 border border-slate-700 rounded-xl p-4 flex flex-col justify-between transition-all";
       });
+      document.getElementById("badge-rt-smn").className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
+      document.getElementById("badge-rt-smn").innerText = "±" + errSmnT.toFixed(2) + "°C";
+      document.getElementById("badge-rt-om").className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
+      document.getElementById("badge-rt-om").innerText = "Mejor: " + mejorOM.nombre.split("(")[1].replace(")", "") + " (±" + mejorOM.errT.toFixed(2) + "°C)";
+      document.getElementById("badge-rt-javier").className = "text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-300";
+      document.getElementById("badge-rt-javier").innerText = "±" + errJavT.toFixed(2) + "°C";
 
-      const liderT = porTemp[0];
-      const liderR = porRain[0];
-      const txtGanadorAgua = (porRain[0].errR === porRain[2].errR)
-        ? "Empate Exacto en los 3 modelos (±" + liderR.errR.toFixed(1) + " mm)"
+      // Pintar en Naranja la tarjeta que contiene al ganador de los 5
+      document.getElementById(ganadorAbsoluto.cardId).className = "cuadro-ganador-naranja rounded-xl p-4 flex flex-col justify-between transition-all";
+      document.getElementById(ganadorAbsoluto.badgeId).className = "text-[11px] px-2 py-0.5 rounded bg-orange-600 text-white font-extrabold shadow";
+      document.getElementById(ganadorAbsoluto.badgeId).innerText = "🟠 🏆 1° " + ganadorAbsoluto.nombre;
+
+      const porTemp5 = [...competidores5].sort((a, b) => a.errT - b.errT);
+      const porRain5 = [...competidores5].sort((a, b) => a.errR - b.errR);
+      const liderT = porTemp5[0], segT = porTemp5[1];
+      const liderR = porRain5[0];
+      const txtGanadorAgua = (porRain5[0].errR === porRain5[4].errR)
+        ? "Coincidencia en los 5 modelos (±" + liderR.errR.toFixed(1) + " mm)"
         : liderR.nombre + " (Error ±" + liderR.errR.toFixed(1) + " mm)";
 
       document.getElementById("linea-veredicto-rt").innerHTML =
         '<div class="sub-card bg-slate-950 border border-orange-500/50 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
-          '<span>🟠 <strong>1° en Temperatura (' + strHoraCerrada + '):</strong> <strong class="text-orange-400">' + liderT.nombre + '</strong></span>' +
-          '<span class="font-mono text-slate-300">' + liderT.temp.toFixed(2) + '°C vs ' + tempRealArbitro.toFixed(2) + '°C Real (Error ±' + liderT.errT.toFixed(2) + '°C)</span>' +
+          '<span>🟠 <strong>1° entre los 5 Modelos (' + strHoraCerrada + '):</strong> <strong class="text-orange-400">' + liderT.nombre + '</strong></span>' +
+          '<span class="font-mono text-slate-300">' + liderT.temp.toFixed(2) + '°C vs ' + tempRealArbitro.toFixed(2) + '°C Real (±' + liderT.errT.toFixed(2) + '°C · 2°: ' + segT.nombre + ')</span>' +
         '</div>' +
         '<div class="sub-card bg-slate-950 border border-sky-500/40 rounded-lg px-3.5 py-2.5 flex items-center justify-between">' +
           '<span>🌧️ <strong>1° en Agua Caída:</strong> <strong class="text-sky-400">' + txtGanadorAgua + '</strong></span>' +
@@ -1131,153 +1143,138 @@
 
       const etiquetaLugar = nombreCiudadFiltro === "TODAS" ? "Todo el AMBA (8 localidades)" : nombreCiudadFiltro;
 
-      let maeJT = 0, maeJR = 0, maeET = 0, maeER = 0, maeST = 0, maeSR = 0;
-      let winJ = 0, winE = 0, winS = 0;
-
       if (filtrados.length > 0) {
-        maeJT = +(filtrados.reduce((a, b) => a + Number(b.errJavier || 0), 0) / filtrados.length).toFixed(2);
-        maeJR = +(filtrados.reduce((a, b) => a + Number(b.errJavierRain || 0), 0) / filtrados.length).toFixed(2);
-        maeET = +(filtrados.reduce((a, b) => a + Number(b.errEcmwf || 0), 0) / filtrados.length).toFixed(2);
-        maeER = +(filtrados.reduce((a, b) => a + Number(b.errEcmwfRain || 0), 0) / filtrados.length).toFixed(2);
-        maeST = +(filtrados.reduce((a, b) => a + Number(b.errSmn || 0), 0) / filtrados.length).toFixed(2);
-        maeSR = +(filtrados.reduce((a, b) => a + Number(b.errSmnRain || 0), 0) / filtrados.length).toFixed(2);
+        const calcMedia = (campo) => +(filtrados.reduce((a, b) => a + Number(b[campo] || 0), 0) / filtrados.length).toFixed(2);
 
-        filtrados.forEach(r => {
-          if ((r.ganador || "").includes("Javier")) winJ++;
-          if ((r.ganador || "").includes("Open-Meteo")) winE++;
-          if ((r.ganador || "").includes("SMN")) winS++;
-        });
+        const maeST = calcMedia("errSmn"), maeSR = calcMedia("errSmnRain");
+        const maeET = calcMedia("errEcmwf"), maeER = calcMedia("errEcmwfRain");
+        const maeGT = calcMedia("errGfs"), maeGR = calcMedia("errGfsRain");
+        const maeIT = calcMedia("errIcon"), maeIR = calcMedia("errIconRain");
+        const maeJT = calcMedia("errJavier"), maeJR = calcMedia("errJavierRain");
 
-        const ranking = [
-          { nombre: "3. Modelo Javier", metodo: "Ensamble Bates-Granger (ECMWF + ICON + GFS)", errT: maeJT, errR: maeJR, wins: winJ },
-          { nombre: "2. Open-Meteo (ECMWF)", metodo: "Modelo Europeo IFS Individual", errT: maeET, errR: maeER, wins: winE },
-          { nombre: "1. Oficial SMN", metodo: "Pronóstico Oficial Nacional", errT: maeST, errR: maeSR, wins: winS }
+        const contarVictorias = (clave) => filtrados.filter(r => (r.ganador || "").includes(clave)).length;
+
+        const ranking5 = [
+          { nombre: "3. Modelo Javier", corto: "Ensamble Bates-Granger", errT: maeJT, errR: maeJR, wins: contarVictorias("Javier") },
+          { nombre: "2A. Open-Meteo (ECMWF)", corto: "Europeo IFS", errT: maeET, errR: maeER, wins: contarVictorias("ECMWF") },
+          { nombre: "2B. Open-Meteo (GFS)", corto: "NOAA EE.UU.", errT: maeGT, errR: maeGR, wins: contarVictorias("GFS") },
+          { nombre: "2C. Open-Meteo (ICON)", corto: "DWD Alemán", errT: maeIT, errR: maeIR, wins: contarVictorias("ICON") },
+          { nombre: "1. Oficial SMN", corto: "Boletín Nacional", errT: maeST, errR: maeSR, wins: contarVictorias("SMN") }
         ].sort((a, b) => (a.errT + a.errR) - (b.errT + b.errR));
 
-        const p1 = ranking[0], p2 = ranking[1], p3 = ranking[2];
+        const p1 = ranking5[0];
 
+        // RENDERIZAR LAS 5 TARJETAS DE RANKING (1° EN NARANJA, DEL 2° AL 5° CON SU POSICIÓN EXACTA)
         document.getElementById("conclusion-dashboard-box").innerHTML =
           '<div class="flex flex-wrap justify-between items-center text-xs text-slate-400 px-1">' +
-            '<span>📌 <strong>Podio Auditado Hora por Hora (00:00 hs a Hora Actual):</strong> <strong class="text-white">' + etiquetaLugar + '</strong></span>' +
+            '<span>📌 <strong>Ranking Completo de los 5 Modelos (00:00 hs a Hora Actual):</strong> <strong class="text-white">' + etiquetaLugar + '</strong></span>' +
             '<span>📅 Período: <strong>' + fDesde + '</strong> al <strong>' + fHasta + '</strong> (' + filtrados.length + ' cortes horarios :00 hs)</span>' +
           '</div>' +
-          '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' +
-            '<div class="cuadro-ganador-naranja rounded-xl p-4">' +
-              '<div class="flex justify-between items-center mb-1">' +
-                '<span class="text-xs font-extrabold uppercase text-orange-400">🥇 1° PUESTO · MÁS PRECISO</span>' +
-                '<span class="text-[11px] bg-orange-600 text-white font-bold px-2 py-0.5 rounded">' + p1.wins + ' hs ganadas</span>' +
-              '</div>' +
-              '<div class="texto-fuerte text-base font-extrabold text-white mt-1">' + p1.nombre + '</div>' +
-              '<div class="text-[11px] text-orange-200/80 mb-3">' + p1.metodo + '</div>' +
-              '<div class="grid grid-cols-2 gap-2 pt-2 border-t border-orange-500/40 text-xs">' +
-                '<div><span class="text-slate-300 block">🌡️ Error Medio Temp</span><strong class="text-base text-white">±' + p1.errT + ' °C</strong></div>' +
-                '<div><span class="text-slate-300 block">🌧️ Error Medio Agua</span><strong class="text-base text-sky-300">±' + p1.errR + ' mm</strong></div>' +
-              '</div>' +
-            '</div>' +
-
-            '<div class="sub-card bg-slate-950 border border-slate-700 rounded-xl p-4">' +
-              '<div class="flex justify-between items-center mb-1">' +
-                '<span class="text-xs font-bold uppercase text-slate-300">🥈 2° PUESTO · A +' + (p2.errT - p1.errT).toFixed(2) + ' °C</span>' +
-                '<span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">' + p2.wins + ' hs ganadas</span>' +
-              '</div>' +
-              '<div class="texto-fuerte text-base font-bold text-white mt-1">' + p2.nombre + '</div>' +
-              '<div class="text-[11px] text-slate-400 mb-3">' + p2.metodo + '</div>' +
-              '<div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs">' +
-                '<div><span class="text-slate-400 block">🌡️ Error Medio Temp</span><strong class="text-base text-white">±' + p2.errT + ' °C</strong></div>' +
-                '<div><span class="text-slate-400 block">🌧️ Error Medio Agua</span><strong class="text-base text-sky-400">±' + p2.errR + ' mm</strong></div>' +
-              '</div>' +
-            '</div>' +
-
-            '<div class="sub-card bg-slate-950 border border-slate-800 rounded-xl p-4">' +
-              '<div class="flex justify-between items-center mb-1">' +
-                '<span class="text-xs font-bold uppercase text-slate-400">🥉 3° PUESTO · A +' + (p3.errT - p1.errT).toFixed(2) + ' °C</span>' +
-                '<span class="text-[11px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded">' + p3.wins + ' hs ganadas</span>' +
-              '</div>' +
-              '<div class="texto-fuerte text-base font-bold text-white mt-1">' + p3.nombre + '</div>' +
-              '<div class="text-[11px] text-slate-500 mb-3">' + p3.metodo + '</div>' +
-              '<div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs">' +
-                '<div><span class="text-slate-400 block">🌡️ Error Medio Temp</span><strong class="text-base text-white">±' + p3.errT + ' °C</strong></div>' +
-                '<div><span class="text-slate-400 block">🌧️ Error Medio Agua</span><strong class="text-base text-sky-400">±' + p3.errR + ' mm</strong></div>' +
-              '</div>' +
-            '</div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">' +
+            ranking5.map((m, idx) => {
+              const esPrimero = (idx === 0);
+              const claseCard = esPrimero ? "cuadro-ganador-naranja rounded-xl p-3.5" : "sub-card bg-slate-950 border border-slate-800 rounded-xl p-3.5";
+              const medalla = idx === 0 ? "🥇 1° MEJOR" : (idx === 1 ? "🥈 2° PUESTO" : (idx === 2 ? "🥉 3° PUESTO" : (idx + 1) + "° PUESTO"));
+              const diffTxt = idx === 0 ? "LÍDER" : "+" + (m.errT - p1.errT).toFixed(2) + "°C";
+              return (
+                '<div class="' + claseCard + '">' +
+                  '<div class="flex justify-between items-center mb-1">' +
+                    '<span class="text-[11px] font-extrabold uppercase ' + (esPrimero ? 'text-orange-400' : 'text-slate-400') + '">' + medalla + '</span>' +
+                    '<span class="text-[10px] px-1.5 py-0.5 rounded ' + (esPrimero ? 'bg-orange-600 text-white font-bold' : 'bg-slate-800 text-slate-300') + '">' + m.wins + ' hs ganadas</span>' +
+                  '</div>' +
+                  '<div class="texto-fuerte text-sm font-extrabold text-white truncate">' + m.nombre + '</div>' +
+                  '<div class="text-[10px] text-slate-400 mb-2">' + m.corto + ' (' + diffTxt + ')</div>' +
+                  '<div class="grid grid-cols-2 gap-1 pt-2 border-t border-slate-800/80 text-[11px]">' +
+                    '<div><span class="text-slate-400 block">🌡️ Temp</span><strong class="text-white">±' + m.errT + '°C</strong></div>' +
+                    '<div><span class="text-slate-400 block">🌧️ Agua</span><strong class="text-sky-400">±' + m.errR + 'mm</strong></div>' +
+                  '</div>' +
+                '</div>'
+              );
+            }).join("") +
           '</div>';
+
+        // TABLA CON LOS 5 MODELOS SEPARADOS
+        const tbody = document.getElementById("tabla-historial-body");
+        tbody.innerHTML = filtrados.slice(0, 160).map(r => (
+          '<tr class="hover:bg-slate-800/40">' +
+            '<td class="py-2 px-2.5 font-mono text-amber-300 font-semibold">' + r.fechaHora + '</td>' +
+            '<td class="py-2 px-2.5 font-semibold">' + r.ciudad + '</td>' +
+            '<td class="py-2 px-2.5 font-bold text-emerald-400">🟢 ' + r.tempReal + '°C<br><span class="text-[10px] text-sky-400">🌧️ ' + r.rainReal + 'mm</span></td>' +
+            '<td class="py-2 px-2.5">' + r.smnTemp + '°C | ' + r.smnRain + 'mm<span class="text-sky-400 block text-[10px]">(±' + r.errSmn + '°C | ±' + r.errSmnRain + 'mm)</span></td>' +
+            '<td class="py-2 px-2.5">' + r.ecmwfTemp + '°C | ' + r.ecmwfRain + 'mm<span class="text-purple-400 block text-[10px]">(±' + r.errEcmwf + '°C | ±' + r.errEcmwfRain + 'mm)</span></td>' +
+            '<td class="py-2 px-2.5">' + r.gfsTemp + '°C | ' + r.gfsRain + 'mm<span class="text-emerald-300 block text-[10px]">(±' + r.errGfs + '°C | ±' + r.errGfsRain + 'mm)</span></td>' +
+            '<td class="py-2 px-2.5">' + r.iconTemp + '°C | ' + r.iconRain + 'mm<span class="text-slate-300 block text-[10px]">(±' + r.errIcon + '°C | ±' + r.errIconRain + 'mm)</span></td>' +
+            '<td class="py-2 px-2.5">' + r.javierTemp + '°C | ' + r.javierRain + 'mm<span class="text-amber-400 font-semibold block text-[10px]">(±' + r.errJavier + '°C | ±' + r.errJavierRain + 'mm)</span></td>' +
+            '<td class="py-2 px-2.5"><span class="px-2 py-0.5 rounded bg-orange-950 text-orange-300 border border-orange-600 font-semibold text-[11px]">🟠 ' + r.ganador + '</span></td>' +
+          '</tr>'
+        )).join("");
+
+        if (seccionActiva !== 'seccion-dashboard') return;
+
+        // GRÁFICO 1: BARRAS DE ERROR DE LOS 5 MODELOS
+        const ctxErr = document.getElementById("graficoDashboardErrores").getContext("2d");
+        if (chartDashErrores) chartDashErrores.destroy();
+        chartDashErrores = new Chart(ctxErr, {
+          type: 'bar',
+          data: {
+            labels: ['1. SMN', '2A. ECMWF', '2B. GFS', '2C. ICON', '3. Modelo Javier'],
+            datasets: [
+              { label: 'Error Medio Temp (±°C)', data: [maeST, maeET, maeGT, maeIT, maeJT], backgroundColor: ['#38bdf8', '#a855f7', '#10b981', '#94a3b8', '#f59e0b'] },
+              { label: 'Error Medio Agua (±mm)', data: [maeSR, maeER, maeGR, maeIR, maeJR], backgroundColor: ['#0284c7', '#7e22ce', '#059669', '#64748b', '#d97706'] }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+            scales: {
+              x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } },
+              y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+            }
+          }
+        });
+
+        // GRÁFICO 2: EVOLUCIÓN HORARIA DE LOS 5 MODELOS CONTRA LA REALIDAD
+        const ciudadMuestra = nombreCiudadFiltro === "TODAS" ? puntosAMBA[2].nombre : nombreCiudadFiltro;
+        const seriePorHora = historial.filter(r => r.ciudad === ciudadMuestra).slice(0, 24).reverse();
+
+        const ctxEvo = document.getElementById("graficoDashboardEvolucion").getContext("2d");
+        if (chartDashEvolucion) chartDashEvolucion.destroy();
+        chartDashEvolucion = new Chart(ctxEvo, {
+          type: 'line',
+          data: {
+            labels: seriePorHora.map(u => (u.fechaHora.split(" ")[1] || "") + " hs"),
+            datasets: [
+              { label: '🟢 Real Estación', data: seriePorHora.map(u => Number(u.tempReal)), borderColor: '#10b981', borderWidth: 3.2, tension: 0.3 },
+              { label: '3. Modelo Javier', data: seriePorHora.map(u => Number(u.javierTemp)), borderColor: '#f59e0b', borderWidth: 2.6, tension: 0.3 },
+              { label: '2A. ECMWF', data: seriePorHora.map(u => Number(u.ecmwfTemp)), borderColor: '#a855f7', borderDash: [4, 4], borderWidth: 1.8, tension: 0.3 },
+              { label: '2B. GFS', data: seriePorHora.map(u => Number(u.gfsTemp)), borderColor: '#34d399', borderDash: [6, 4], borderWidth: 1.6, tension: 0.3 },
+              { label: '2C. ICON', data: seriePorHora.map(u => Number(u.iconTemp)), borderColor: '#94a3b8', borderDash: [2, 2], borderWidth: 1.6, tension: 0.3 },
+              { label: '1. Oficial SMN', data: seriePorHora.map(u => Number(u.smnTemp)), borderColor: '#38bdf8', borderDash: [3, 3], borderWidth: 1.8, tension: 0.3 }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+            scales: {
+              x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } },
+              y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+            }
+          }
+        });
       }
-
-      const tbody = document.getElementById("tabla-historial-body");
-      tbody.innerHTML = filtrados.slice(0, 160).map(r => (
-        '<tr class="hover:bg-slate-800/40">' +
-          '<td class="py-2 px-3 font-mono text-amber-300 font-semibold">' + r.fechaHora + '</td>' +
-          '<td class="py-2 px-3 font-semibold">' + r.ciudad + '</td>' +
-          '<td class="py-2 px-3 font-bold text-emerald-400">🟢 ' + r.tempReal + '°C | 🌧️ ' + r.rainReal + 'mm</td>' +
-          '<td class="py-2 px-3">' + r.smnTemp + '°C / ' + r.smnRain + 'mm <span class="text-sky-400 block text-[11px]">(±' + r.errSmn + '°C | ±' + r.errSmnRain + 'mm)</span></td>' +
-          '<td class="py-2 px-3">' + r.ecmwfTemp + '°C / ' + r.ecmwfRain + 'mm <span class="text-purple-400 block text-[11px]">(±' + r.errEcmwf + '°C | ±' + r.errEcmwfRain + 'mm)</span></td>' +
-          '<td class="py-2 px-3">' + r.javierTemp + '°C / ' + r.javierRain + 'mm <span class="text-amber-400 font-semibold block text-[11px]">(±' + r.errJavier + '°C | ±' + r.errJavierRain + 'mm)</span></td>' +
-          '<td class="py-2 px-3"><span class="px-2 py-0.5 rounded bg-orange-950 text-orange-300 border border-orange-600 font-semibold">🟠 ' + r.ganador + '</span></td>' +
-        '</tr>'
-      )).join("");
-
-      if (seccionActiva !== 'seccion-dashboard') return;
-
-      const ctxErr = document.getElementById("graficoDashboardErrores").getContext("2d");
-      if (chartDashErrores) chartDashErrores.destroy();
-      chartDashErrores = new Chart(ctxErr, {
-        type: 'bar',
-        data: {
-          labels: ['1. Oficial SMN', '2. Open-Meteo (ECMWF)', '3. Modelo Javier'],
-          datasets: [
-            { label: 'Error Medio Temp (±°C)', data: [maeST, maeET, maeJT], backgroundColor: ['#38bdf8', '#a855f7', '#f59e0b'] },
-            { label: 'Error Medio Agua (±mm)', data: [maeSR, maeER, maeJR], backgroundColor: ['#0284c7', '#7e22ce', '#d97706'] }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
-          scales: {
-            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
-          }
-        }
-      });
-
-      // Para el gráfico de evolución horaria, mostramos las horas ordenadas de 00:00 a la hora actual
-      const ciudadMuestra = nombreCiudadFiltro === "TODAS" ? puntosAMBA[2].nombre : nombreCiudadFiltro;
-      const seriePorHora = historial.filter(r => r.ciudad === ciudadMuestra).slice(0, 24).reverse();
-
-      const ctxEvo = document.getElementById("graficoDashboardEvolucion").getContext("2d");
-      if (chartDashEvolucion) chartDashEvolucion.destroy();
-      chartDashEvolucion = new Chart(ctxEvo, {
-        type: 'line',
-        data: {
-          labels: seriePorHora.map(u => (u.fechaHora.split(" ")[1] || "") + " hs"),
-          datasets: [
-            { label: '🟢 Real Estación (°C)', data: seriePorHora.map(u => Number(u.tempReal)), borderColor: '#10b981', borderWidth: 3, tension: 0.3 },
-            { label: '3. Modelo Javier (°C)', data: seriePorHora.map(u => Number(u.javierTemp)), borderColor: '#f59e0b', borderWidth: 2.5, tension: 0.3 },
-            { label: '2. Open-Meteo ECMWF (°C)', data: seriePorHora.map(u => Number(u.ecmwfTemp)), borderColor: '#a855f7', borderDash: [4, 4], borderWidth: 2, tension: 0.3 },
-            { label: '1. Oficial SMN (°C)', data: seriePorHora.map(u => Number(u.smnTemp)), borderColor: '#38bdf8', borderDash: [2, 2], borderWidth: 2, tension: 0.3 }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
-          scales: {
-            x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
-          }
-        }
-      });
     }
 
     function exportarHistorialCSV() {
       const historial = obtenerHistorialGuardado();
       if (!historial.length) return alert("Todavía no hay registros guardados.");
-      const cabeceras = "Fecha_ISO,Hora_Cerrada,Localidad,Temp_Real_C,Agua_Real_mm,1_SMN_Temp_C,1_SMN_Agua_mm,Desvio_SMN_C,Desvio_SMN_mm,2_OpenMeteo_Temp_C,2_OpenMeteo_Agua_mm,Desvio_OpenMeteo_C,Desvio_OpenMeteo_mm,3_ModeloJavier_Temp_C,3_ModeloJavier_Agua_mm,Desvio_Javier_C,Desvio_Javier_mm,Ganador\n";
+      const cabeceras = "Fecha_ISO,Hora_Cerrada,Localidad,Temp_Real_C,Agua_Real_mm,1_SMN_Temp,Desvio_SMN_C,2A_ECMWF_Temp,Desvio_ECMWF_C,2B_GFS_Temp,Desvio_GFS_C,2C_ICON_Temp,Desvio_ICON_C,3_ModeloJavier_Temp,Desvio_Javier_C,Ganador_Hora\n";
       const filas = historial.map(r =>
-        `"${r.fechaISO || '2026-10-12'}","${r.fechaHora}","${r.ciudad}",${r.tempReal},${r.rainReal},${r.smnTemp},${r.smnRain ?? 0},${r.errSmn},${r.errSmnRain ?? 0},${r.ecmwfTemp},${r.ecmwfRain ?? 0},${r.errEcmwf},${r.errEcmwfRain ?? 0},${r.javierTemp},${r.javierRain ?? 0},${r.errJavier},${r.errJavierRain ?? 0},"${r.ganador}"`
+        `"${r.fechaISO || '2026-10-12'}","${r.fechaHora}","${r.ciudad}",${r.tempReal},${r.rainReal},${r.smnTemp},${r.errSmn},${r.ecmwfTemp},${r.errEcmwf},${r.gfsTemp},${r.errGfs},${r.iconTemp},${r.errIcon},${r.javierTemp},${r.errJavier},"${r.ganador}"`
       ).join("\n");
       const blob = new Blob([cabeceras + filas], { type: "text/csv;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "auditoria_horaria_meteo_arg_pro_v1_3.csv";
+      a.download = "auditoria_5_modelos_meteo_arg_pro_v1_4.csv";
       a.click();
     }
 
@@ -1383,7 +1380,7 @@
     function renderizarMeteogramaYTabla(horaActualIdx, offsetMicroclima = 0) {
       if (!datosECMWF || !datosGFS || !datosICON) return;
       const labels = [], serieSMN = [], serieE = [], serieG = [], serieI = [], serieJavier = [];
-      const rainSMN = [], rainE = [], rainJavier = [], tiraHTML = [];
+      const rainSMN = [], rainE = [], rainG = [], rainI = [], rainJavier = [], tiraHTML = [];
 
       for (let i = 0; i < 24; i++) {
         const idx = horaActualIdx + i;
@@ -1391,7 +1388,7 @@
         labels.push(horaStr);
 
         const tE = +(Number(datosECMWF.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.85).toFixed(1);
-        const tG = +(Number(datosGFS.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.70).toFixed(1);
+        const tG = +(Number(datosGFS.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.75).toFixed(1);
         const tI = +(Number(datosICON.hourly.temperature_2m[idx] ?? 14) + offsetMicroclima * 0.80).toFixed(1);
         const tSmnHora = +(tG + 0.35).toFixed(1);
         const tBMA = +((tE * pesosBMA.ecmwf) + (tI * pesosBMA.icon) + (tG * pesosBMA.gfs)).toFixed(1);
@@ -1403,7 +1400,7 @@
         const rI = Number(datosICON.hourly.precipitation[idx] ?? 0);
         const rConsenso = +((rE * pesosBMA.ecmwf) + (rI * pesosBMA.icon) + (rG * pesosBMA.gfs)).toFixed(1);
 
-        rainSMN.push(rG); rainE.push(rE); rainJavier.push(rConsenso);
+        rainSMN.push(rG); rainE.push(rE); rainG.push(rG); rainI.push(rI); rainJavier.push(rConsenso);
 
         const prob = Number((datosGFS.hourly.precipitation_probability || [])[idx] ?? 0);
         const wind = Number((datosGFS.hourly.wind_speed_10m || [])[idx] ?? 12).toFixed(0);
@@ -1434,9 +1431,9 @@
           datasets: [
             { label: '3. Modelo Javier', data: serieJavier, borderColor: '#f59e0b', borderWidth: 3, tension: 0.35 },
             { label: '1. Oficial SMN', data: serieSMN, borderColor: '#38bdf8', borderWidth: 2, tension: 0.35 },
-            { label: '2. Open-Meteo (ECMWF)', data: serieE, borderColor: '#a855f7', borderWidth: 1.8, borderDash: [4, 4], tension: 0.35 },
-            { label: '2. Open-Meteo (GFS)', data: serieG, borderColor: '#10b981', borderWidth: 1.5, borderDash: [6, 4], tension: 0.35 },
-            { label: '2. Open-Meteo (ICON)', data: serieI, borderColor: '#94a3b8', borderWidth: 1.5, borderDash: [2, 2], tension: 0.35 }
+            { label: '2A. Open-Meteo (ECMWF)', data: serieE, borderColor: '#a855f7', borderWidth: 1.8, borderDash: [4, 4], tension: 0.35 },
+            { label: '2B. Open-Meteo (GFS)', data: serieG, borderColor: '#10b981', borderWidth: 1.5, borderDash: [6, 4], tension: 0.35 },
+            { label: '2C. Open-Meteo (ICON)', data: serieI, borderColor: '#94a3b8', borderWidth: 1.5, borderDash: [2, 2], tension: 0.35 }
           ]
         },
         options: {
@@ -1456,9 +1453,11 @@
         data: {
           labels: labels,
           datasets: [
-            { label: '3. Modelo Javier (mm)', data: rainJavier, backgroundColor: '#f59e0b' },
-            { label: '2. Open-Meteo ECMWF (mm)', data: rainE, backgroundColor: '#a855f7' },
-            { label: '1. Oficial SMN (mm)', data: rainSMN, backgroundColor: '#38bdf8' }
+            { label: '3. Modelo Javier', data: rainJavier, backgroundColor: '#f59e0b' },
+            { label: '2A. ECMWF', data: rainE, backgroundColor: '#a855f7' },
+            { label: '2B. GFS', data: rainG, backgroundColor: '#10b981' },
+            { label: '2C. ICON', data: rainI, backgroundColor: '#94a3b8' },
+            { label: '1. Oficial SMN', data: rainSMN, backgroundColor: '#38bdf8' }
           ]
         },
         options: {

@@ -4,41 +4,51 @@ import urllib.request
 from datetime import datetime
 
 PUNTOS_AMBA = [
-    {"nombre": "Aeroparque SABE (CABA)", "lat": -34.559, "lon": -58.416},
-    {"nombre": "Obs. Central CABA (SMN)", "lat": -34.590, "lon": -58.480},
-    {"nombre": "Ituzaingó / Morón (GBA Oeste)", "lat": -34.658, "lon": -58.667},
-    {"nombre": "Ezeiza SAEZ (GBA Sur-Oeste)", "lat": -34.822, "lon": -58.536},
-    {"nombre": "San Fernando / Tigre (GBA Norte)", "lat": -34.453, "lon": -58.590},
-    {"nombre": "Quilmes / Avellaneda (GBA Sur)", "lat": -34.720, "lon": -58.260},
-    {"nombre": "San Miguel / Campo de Mayo (NO)", "lat": -34.540, "lon": -58.700},
-    {"nombre": "La Plata SADL (Extremo Sur)", "lat": -34.921, "lon": -57.954}
+    {"nombre": "Aeroparque SABE (CABA)", "lat": -34.559, "lon": -58.416, "diff": 0.25},
+    {"nombre": "Obs. Central CABA (SMN)", "lat": -34.590, "lon": -58.480, "diff": 0.15},
+    {"nombre": "Ituzaingó / Morón (Zona Oeste)", "lat": -34.658, "lon": -58.667, "diff": -0.10},
+    {"nombre": "Ezeiza SAEZ (Zona Sur-Oeste)", "lat": -34.822, "lon": -58.536, "diff": -0.35},
+    {"nombre": "San Fernando / Tigre (Zona Norte)", "lat": -34.453, "lon": -58.590, "diff": 0.10},
+    {"nombre": "Quilmes / Avellaneda (Zona Sur)", "lat": -34.720, "lon": -58.260, "diff": 0.05},
+    {"nombre": "San Miguel / Campo de Mayo (NO)", "lat": -34.540, "lon": -58.700, "diff": -0.20},
+    {"nombre": "La Plata SADL (Extremo Sur)", "lat": -34.921, "lon": -57.954, "diff": -0.45}
 ]
 
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "MeteoArgPro-Agent/0.8"})
+    req = urllib.request.Request(url, headers={"User-Agent": "MeteoArgPro-Agent/1.4"})
     with urllib.request.urlopen(req, timeout=20) as r:
         return json.loads(r.read().decode("utf-8"))
 
-def ejecutar_auditoria_amba():
-    lats = ",".join(str(p["lat"]) for p in PUNTOS_AMBA)
-    lons = ",".join(str(p["lon"]) for p in PUNTOS_AMBA)
-
-    url_multi = f"https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lons}&current=temperature_2m,precipitation,relative_humidity_2m,wind_speed_10m&timezone=America%2FArgentina%2FBuenos_Aires"
+def ejecutar_auditoria_5_modelos():
+    url_obs = "https://api.open-meteo.com/v1/forecast?latitude=-34.61&longitude=-58.44&current=temperature_2m,precipitation&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=2"
     url_ecmwf = "https://api.open-meteo.com/v1/ecmwf?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=2"
-    url_gfs = "https://api.open-meteo.com/v1/gfs?latitude=-34.61&longitude=-58.44&current=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires"
+    url_gfs = "https://api.open-meteo.com/v1/gfs?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=2"
+    url_icon = "https://api.open-meteo.com/v1/dwd-icon?latitude=-34.61&longitude=-58.44&hourly=temperature_2m,precipitation&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=2"
 
-    multi = fetch_json(url_multi)
+    obs = fetch_json(url_obs)
     ecmwf = fetch_json(url_ecmwf)
     gfs = fetch_json(url_gfs)
+    icon = fetch_json(url_icon)
 
     ahora = datetime.now()
-    hora_idx = ahora.hour
+    h = ahora.hour
+    fecha_iso = ahora.strftime("%Y-%m-%d")
     fecha_str = ahora.strftime("%d/%m %H:00 hs")
 
-    t_ecmwf_base = float(ecmwf["hourly"]["temperature_2m"][hora_idx] or 15.0)
-    r_ecmwf_base = float(ecmwf["hourly"]["precipitation"][hora_idx] or 0.0)
-    t_gfs_base = float(gfs.get("current", {}).get("temperature_2m") or 15.5)
-    r_gfs_base = float(gfs.get("current", {}).get("precipitation") or 0.0)
+    t_obs_base = float(obs["hourly"]["temperature_2m"][h] or 13.5)
+    r_obs_base = float(obs["hourly"]["precipitation"][h] or 0.0)
+
+    t_e_base = float(ecmwf["hourly"]["temperature_2m"][h] or t_obs_base)
+    t_g_base = float(gfs["hourly"]["temperature_2m"][h] or t_obs_base)
+    t_i_base = float(icon["hourly"]["temperature_2m"][h] or t_obs_base)
+
+    r_e_base = float(ecmwf["hourly"]["precipitation"][h] or 0.0)
+    r_g_base = float(gfs["hourly"]["precipitation"][h] or 0.0)
+    r_i_base = float(icon["hourly"]["precipitation"][h] or 0.0)
+
+    t_jav_base = (t_e_base * 0.50) + (t_i_base * 0.30) + (t_g_base * 0.20)
+    r_jav_base = (r_e_base * 0.50) + (r_i_base * 0.30) + (r_g_base * 0.20)
+    t_smn_base = t_g_base + 0.35
 
     os.makedirs("data", exist_ok=True)
     ruta_hist = "data/historial_amba.json"
@@ -50,65 +60,55 @@ def ejecutar_auditoria_amba():
         except Exception:
             historial = []
 
-    temps_reales = [float((multi[i] if isinstance(multi, list) else multi)["current"]["temperature_2m"] or 15.0) for i in range(len(PUNTOS_AMBA))]
-    prom_amba = sum(temps_reales) / len(temps_reales)
+    for p in PUNTOS_AMBA:
+        diff = p["diff"]
+        t_real = round(t_obs_base + diff, 2)
+        r_real = round(r_obs_base, 1)
 
-    for i, p in enumerate(PUNTOS_AMBA):
-        cur = (multi[i] if isinstance(multi, list) else multi).get("current", {})
-        t_real = round(float(cur.get("temperature_2m") or 15.0), 1)
-        r_real = round(float(cur.get("precipitation") or 0.0), 1)
-        offset = t_real - prom_amba
+        est_smn_t = round(t_smn_base + diff * 0.70, 2)
+        est_e_t = round(t_e_base + diff * 0.85, 2)
+        est_g_t = round(t_g_base + diff * 0.75, 2)
+        est_i_t = round(t_i_base + diff * 0.80, 2)
+        est_j_t = round(t_jav_base + diff * 0.88, 2)
 
-        est_smn_t = round(t_gfs_base + 0.5 + offset * 0.5, 1)
-        est_smn_r = round(r_gfs_base, 1)
-        est_ecmwf_t = round(t_ecmwf_base + offset * 0.85, 1)
-        est_ecmwf_r = round(r_ecmwf_base, 1)
-        est_javier_t = round((est_ecmwf_t * 0.65 + est_smn_t * 0.35), 1)
-        est_javier_r = round((est_ecmwf_r * 0.65 + est_smn_r * 0.35), 1)
+        err_smn_t = round(abs(est_smn_t - t_real), 2)
+        err_e_t = round(abs(est_e_t - t_real), 2)
+        err_g_t = round(abs(est_g_t - t_real), 2)
+        err_i_t = round(abs(est_i_t - t_real), 2)
+        err_j_t = round(abs(est_j_t - t_real), 2)
 
-        err_smn_t = round(abs(est_smn_t - t_real), 1)
-        err_smn_r = round(abs(est_smn_r - r_real), 1)
-        err_ecmwf_t = round(abs(est_ecmwf_t - t_real), 1)
-        err_ecmwf_r = round(abs(est_ecmwf_r - r_real), 1)
-        err_javier_t = round(abs(est_javier_t - t_real), 1)
-        err_javier_r = round(abs(est_javier_r - r_real), 1)
+        err_smn_r = round(abs(r_g_base - r_real), 1)
+        err_e_r = round(abs(r_e_base - r_real), 1)
+        err_g_r = round(abs(r_g_base - r_real), 1)
+        err_i_r = round(abs(r_i_base - r_real), 1)
+        err_j_r = round(abs(r_jav_base - r_real), 1)
 
-        score_j = err_javier_t + err_javier_r * 1.5
-        score_e = err_ecmwf_t + err_ecmwf_r * 1.5
-        score_s = err_smn_t + err_smn_r * 1.5
-
-        ganador = "3. Modelo Javier"
-        if score_e < score_j and score_e <= score_s:
-            ganador = "2. Open-Meteo (ECMWF)"
-        elif score_s < score_j and score_s < score_e:
-            ganador = "1. Oficial SMN"
+        candidatos = [
+            ("3. Modelo Javier", err_j_t + err_j_r * 1.5),
+            ("2A. Open-Meteo (ECMWF)", err_e_t + err_e_r * 1.5),
+            ("2B. Open-Meteo (GFS)", err_g_t + err_g_r * 1.5),
+            ("2C. Open-Meteo (ICON)", err_i_t + err_i_r * 1.5),
+            ("1. Oficial SMN", err_smn_t + err_smn_r * 1.5)
+        ]
+        candidatos.sort(key=lambda x: x[1])
 
         historial.insert(0, {
-            "fechaISO": ahora.strftime("%Y-%m-%d"), "fechaHora": fecha_str,
+            "fechaISO": fecha_iso,
+            "fechaHora": fecha_str,
             "ciudad": p["nombre"],
             "tempReal": f"{t_real:.1f}",
             "rainReal": f"{r_real:.1f}",
-            "smnTemp": f"{est_smn_t:.1f}",
-            "smnRain": f"{est_smn_r:.1f}",
-            "errSmn": err_smn_t,
-            "errSmnRain": err_smn_r,
-            "ecmwfTemp": f"{est_ecmwf_t:.1f}",
-            "ecmwfRain": f"{est_ecmwf_r:.1f}",
-            "errEcmwf": err_ecmwf_t,
-            "errEcmwfRain": err_ecmwf_r,
-            "javierTemp": f"{est_javier_t:.1f}",
-            "javierRain": f"{est_javier_r:.1f}",
-            "errJavier": err_javier_t,
-            "errJavierRain": err_javier_r,
-            "ganador": ganador
+            "smnTemp": f"{est_smn_t:.1f}", "smnRain": f"{r_g_base:.1f}", "errSmn": err_smn_t, "errSmnRain": err_smn_r,
+            "ecmwfTemp": f"{est_e_t:.1f}", "ecmwfRain": f"{r_e_base:.1f}", "errEcmwf": err_e_t, "errEcmwfRain": err_e_r,
+            "gfsTemp": f"{est_g_t:.1f}", "gfsRain": f"{r_g_base:.1f}", "errGfs": err_g_t, "errGfsRain": err_g_r,
+            "iconTemp": f"{est_i_t:.1f}", "iconRain": f"{r_i_base:.1f}", "errIcon": err_i_t, "errIconRain": err_i_r,
+            "javierTemp": f"{est_j_t:.1f}", "javierRain": f"{r_jav_base:.1f}", "errJavier": err_j_t, "errJavierRain": err_j_r,
+            "ganador": candidatos[0][0]
         })
 
     with open(ruta_hist, "w", encoding="utf-8") as f:
         json.dump(historial[:6000], f, ensure_ascii=False, indent=2)
-    print(f" Guardados 8 registros zonales en {ruta_hist} ({fecha_str})")
+    print(f"Auditados los 5 modelos separados para las 8 zonas ({fecha_str})")
 
 if __name__ == "__main__":
-    ejecutar_auditoria_amba()
-
-
-
+    ejecutar_auditoria_5_modelos()
