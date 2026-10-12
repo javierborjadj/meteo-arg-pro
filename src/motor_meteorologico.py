@@ -104,8 +104,9 @@ def ejecutar_auditoria_amba():
         })
 
     with open(ruta_hist, "w", encoding="utf-8") as f:
-        json.dump(historial[:800], f, ensure_ascii=False, indent=2)
+        json.dump(historial[:6000], f, ensure_ascii=False, indent=2)
     print(f" Guardados 8 registros zonales en {ruta_hist} ({fecha_str})")
 
 if __name__ == "__main__":
     ejecutar_auditoria_amba()
+

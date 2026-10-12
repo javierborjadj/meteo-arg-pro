@@ -1,9 +1,9 @@
-﻿name: Actualizar Meteo-Arg-Pro (AMBA)
+﻿name: Actualizar Meteo-Arg-Pro (Cada 1 Hora)
 
 on:
   schedule:
-    - cron: '0 */3 * * *' # Corre automáticamente cada 3 horas
-  workflow_dispatch:      # Permite ejecutarlo manualmente con 1 clic en GitHub
+    - cron: '10 * * * *' # Corre automáticamente cada 1 hora (minuto 10 de cada hora)
+  workflow_dispatch:     # Permite ejecutarlo manualmente con 1 clic en GitHub
 
 permissions:
   contents: write
@@ -20,12 +20,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Ejecutar Motor Meteorologico y Validacion en Tiempo Real
+      - name: Ejecutar Auditoria Horaria (Temperatura y Agua)
         run: python src/motor_meteorologico.py
 
-      - name: Guardar historial y actualizar web automaticamente
+      - name: Guardar historial horario en el repositorio
         run: |
           git config --global user.name 'Meteo-Arg-Pro Bot'
           git config --global user.email 'bot@meteo-arg-pro.local'
           git add data/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Datos reales AMBA vs Pronosticos" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update horario: Auditoria Temp y Agua AMBA" && git push)
