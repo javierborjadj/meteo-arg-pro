@@ -1,0 +1,31 @@
+﻿name: Actualizar Meteo-Arg-Pro (AMBA)
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # Corre automáticamente cada 3 horas
+  workflow_dispatch:      # Permite ejecutarlo manualmente con 1 clic en GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar-datos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ejecutar Motor Meteorologico y Validacion en Tiempo Real
+        run: python src/motor_meteorologico.py
+
+      - name: Guardar historial y actualizar web automaticamente
+        run: |
+          git config --global user.name 'Meteo-Arg-Pro Bot'
+          git config --global user.email 'bot@meteo-arg-pro.local'
+          git add data/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Datos reales AMBA vs Pronosticos" && git push)
