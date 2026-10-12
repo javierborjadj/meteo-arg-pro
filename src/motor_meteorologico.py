@@ -33,7 +33,7 @@ def ejecutar_auditoria_amba():
 
     ahora = datetime.now()
     hora_idx = ahora.hour
-    fecha_str = ahora.strftime("%d/%m %H:%M hs")
+    fecha_str = ahora.strftime("%d/%m %H:00 hs")
 
     t_ecmwf_base = float(ecmwf["hourly"]["temperature_2m"][hora_idx] or 15.0)
     r_ecmwf_base = float(ecmwf["hourly"]["precipitation"][hora_idx] or 0.0)
@@ -109,5 +109,6 @@ def ejecutar_auditoria_amba():
 
 if __name__ == "__main__":
     ejecutar_auditoria_amba()
+
 
 
